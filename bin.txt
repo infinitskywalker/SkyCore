@@ -1,0 +1,1055 @@
+
+      // // Reveal Jawaban
+      // const reveal = new EmbedBuilder().setTitle("📊 Jawaban");
+      // const revealMsg = await channel.send({ embeds: [reveal] });
+      // for (let i=0;i<question.answers.length;i++) {
+      //   await new Promise(r=>setTimeout(r, 800));
+      //   reveal.setDescription(question.answers.slice(0,i+1).map(a=>`✅ ${a.answer} (${a.score})`).join("\n"));
+      //   await revealMsg.edit({ embeds: [reveal] });
+      // }
+
+
+
+
+// [
+//   {
+//     "question": "Sebutkan makanan yang biasanya dimakan saat sarapan",
+//     "answers": [
+//       {"answer": "nasi goreng", "score": 50},
+//       {"answer": "roti", "score": 30},
+//       {"answer": "sereal", "score": 20}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan peliharaan yang populer",
+//     "answers": [
+//       {"answer": "anjing", "score": 60},
+//       {"answer": "kucing", "score": 35},
+//       {"answer": "ikan", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan warna favorit orang",
+//     "answers": [
+//       {"answer": "biru", "score": 40},
+//       {"answer": "merah", "score": 25},
+//       {"answer": "hitam", "score": 20},
+//       {"answer": "putih", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan olahraga yang populer di dunia",
+//     "answers": [
+//       {"answer": "sepak bola", "score": 60},
+//       {"answer": "basket", "score": 20},
+//       {"answer": "tenis", "score": 10},
+//       {"answer": "renang", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan buah yang manis",
+//     "answers": [
+//       {"answer": "mangga", "score": 30},
+//       {"answer": "apel", "score": 25},
+//       {"answer": "pisang", "score": 20},
+//       {"answer": "anggur", "score": 15},
+//       {"answer": "jeruk", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis transportasi umum",
+//     "answers": [
+//       {"answer": "bus", "score": 40},
+//       {"answer": "kereta", "score": 35},
+//       {"answer": "angkot", "score": 15},
+//       {"answer": "taksi", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan profesi yang banyak dicari",
+//     "answers": [
+//       {"answer": "dokter", "score": 30},
+//       {"answer": "guru", "score": 25},
+//       {"answer": "insinyur", "score": 20},
+//       {"answer": "perawat", "score": 15},
+//       {"answer": "polisi", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan minuman yang populer",
+//     "answers": [
+//       {"answer": "air putih", "score": 40},
+//       {"answer": "kopi", "score": 25},
+//       {"answer": "teh", "score": 20},
+//       {"answer": "susu", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kendaraan pribadi",
+//     "answers": [
+//       {"answer": "mobil", "score": 50},
+//       {"answer": "motor", "score": 40},
+//       {"answer": "sepeda", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang bisa terbang",
+//     "answers": [
+//       {"answer": "burung", "score": 60},
+//       {"answer": "kelelawar", "score": 30},
+//       {"answer": "lebah", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang tinggal di air",
+//     "answers": [
+//       {"answer": "ikan", "score": 50},
+//       {"answer": "udang", "score": 20},
+//       {"answer": "kura-kura", "score": 15},
+//       {"answer": "cumi", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis makanan cepat saji",
+//     "answers": [
+//       {"answer": "burger", "score": 40},
+//       {"answer": "pizza", "score": 30},
+//       {"answer": "hotdog", "score": 20},
+//       {"answer": "kentang goreng", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan alat elektronik yang sering dipakai",
+//     "answers": [
+//       {"answer": "hp", "score": 50},
+//       {"answer": "laptop", "score": 30},
+//       {"answer": "tv", "score": 15},
+//       {"answer": "tablet", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis ikan yang populer",
+//     "answers": [
+//       {"answer": "lele", "score": 30},
+//       {"answer": "gurame", "score": 25},
+//       {"answer": "bandeng", "score": 20},
+//       {"answer": "nemo", "score": 15},
+//       {"answer": "tuna", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan negara yang terkenal dengan menara tinggi",
+//     "answers": [
+//       {"answer": "prancis", "score": 50},
+//       {"answer": "amerika", "score": 25},
+//       {"answer": "china", "score": 15},
+//       {"answer": "uni emirates", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan aplikasi media sosial populer",
+//     "answers": [
+//       {"answer": "instagram", "score": 35},
+//       {"answer": "tiktok", "score": 30},
+//       {"answer": "facebook", "score": 25},
+//       {"answer": "twitter", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang berbahaya",
+//     "answers": [
+//       {"answer": "ular", "score": 35},
+//       {"answer": "hiu", "score": 25},
+//       {"answer": "buaya", "score": 20},
+//       {"answer": "lebah", "score": 10},
+//       {"answer": "kalajengking", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan buah yang berwarna merah",
+//     "answers": [
+//       {"answer": "apel", "score": 40},
+//       {"answer": "strawberry", "score": 30},
+//       {"answer": "semangka", "score": 20},
+//       {"answer": "cherry", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan binatang yang besar",
+//     "answers": [
+//       {"answer": "gajah", "score": 50},
+//       {"answer": "jerapah", "score": 25},
+//       {"answer": "kuda", "score": 15},
+//       {"answer": "paus", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis sayur yang populer",
+//     "answers": [
+//       {"answer": "wortel", "score": 30},
+//       {"answer": "bayam", "score": 25},
+//       {"answer": "kol", "score": 20},
+//       {"answer": "brokoli", "score": 15},
+//       {"answer": "kangkung", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hobi yang populer",
+//     "answers": [
+//       {"answer": "membaca", "score": 25},
+//       {"answer": "menonton film", "score": 25},
+//       {"answer": "olahraga", "score": 20},
+//       {"answer": "memasak", "score": 15},
+//       {"answer": "bermain game", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis musik yang populer",
+//     "answers": [
+//       {"answer": "pop", "score": 40},
+//       {"answer": "rock", "score": 25},
+//       {"answer": "hip-hop", "score": 20},
+//       {"answer": "jazz", "score": 10},
+//       {"answer": "classical", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang ada di kantor",
+//     "answers": [
+//       {"answer": "meja", "score": 35},
+//       {"answer": "kursi", "score": 30},
+//       {"answer": "komputer", "score": 20},
+//       {"answer": "printer", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis makanan cepat saji yang manis",
+//     "answers": [
+//       {"answer": "donat", "score": 50},
+//       {"answer": "kue", "score": 30},
+//       {"answer": "es krim", "score": 20}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan alat musik yang populer",
+//     "answers": [
+//       {"answer": "gitar", "score": 35},
+//       {"answer": "piano", "score": 30},
+//       {"answer": "drum", "score": 20},
+//       {"answer": "biola", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kue yang populer",
+//     "answers": [
+//       {"answer": "coklat", "score": 35},
+//       {"answer": "keju", "score": 25},
+//       {"answer": "red velvet", "score": 20},
+//       {"answer": "stroberi", "score": 10},
+//       {"answer": "lapis", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang hidup di hutan",
+//     "answers": [
+//       {"answer": "harimau", "score": 40},
+//       {"answer": "rusa", "score": 30},
+//       {"answer": "monyet", "score": 20},
+//       {"answer": "beruang", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan merek smartphone terkenal",
+//     "answers": [
+//       {"answer": "apple", "score": 45},
+//       {"answer": "samsung", "score": 35},
+//       {"answer": "xiaomi", "score": 15},
+//       {"answer": "oppo", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan minuman yang diminum saat dingin",
+//     "answers": [
+//       {"answer": "teh hangat", "score": 35},
+//       {"answer": "kopi", "score": 30},
+//       {"answer": "coklat panas", "score": 20},
+//       {"answer": "wedang jahe", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang sering dibawa ke sekolah",
+//     "answers": [
+//       {"answer": "tas", "score": 50},
+//       {"answer": "buku", "score": 30},
+//       {"answer": "pensil", "score": 15},
+//       {"answer": "botol minum", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan negara di Asia yang terkenal",
+//     "answers": [
+//       {"answer": "jepang", "score": 40},
+//       {"answer": "china", "score": 30},
+//       {"answer": "india", "score": 20},
+//       {"answer": "korea selatan", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan kendaraan yang menggunakan roda dua",
+//     "answers": [
+//       {"answer": "sepeda", "score": 35},
+//       {"answer": "motor", "score": 50},
+//       {"answer": "skuter", "score": 10},
+//       {"answer": "vespa", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang ada di kamar tidur",
+//     "answers": [
+//       {"answer": "tempat tidur", "score": 50},
+//       {"answer": "lemari", "score": 25},
+//       {"answer": "meja", "score": 15},
+//       {"answer": "lampu", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis makanan yang digoreng",
+//     "answers": [
+//       {"answer": "tempe", "score": 30},
+//       {"answer": "tahu", "score": 25},
+//       {"answer": "ayam goreng", "score": 25},
+//       {"answer": "pisang goreng", "score": 20}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan olahraga air",
+//     "answers": [
+//       {"answer": "renang", "score": 50},
+//       {"answer": "selancar", "score": 20},
+//       {"answer": "dayung", "score": 20},
+//       {"answer": "menyelam", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang hidup di gurun",
+//     "answers": [
+//       {"answer": "unta", "score": 60},
+//       {"answer": "kadal", "score": 20},
+//       {"answer": "kalajengking", "score": 15},
+//       {"answer": "kaktus", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis buah tropis",
+//     "answers": [
+//       {"answer": "nanas", "score": 35},
+//       {"answer": "mangga", "score": 30},
+//       {"answer": "pepaya", "score": 20},
+//       {"answer": "pisang", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang bisa dijadikan makanan",
+//     "answers": [
+//       {"answer": "ayam", "score": 40},
+//       {"answer": "ikan", "score": 30},
+//       {"answer": "sapi", "score": 20},
+//       {"answer": "bebek", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kue tradisional",
+//     "answers": [
+//       {"answer": "klepon", "score": 30},
+//       {"answer": "dadar gulung", "score": 25},
+//       {"answer": "putu", "score": 20},
+//       {"answer": "lapis", "score": 15},
+//       {"answer": "serabi", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang ada di dapur",
+//     "answers": [
+//       {"answer": "kompor", "score": 40},
+//       {"answer": "panci", "score": 30},
+//       {"answer": "wajan", "score": 20},
+//       {"answer": "pisau", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis minuman dingin",
+//     "answers": [
+//       {"answer": "es teh", "score": 40},
+//       {"answer": "jus", "score": 30},
+//       {"answer": "soda", "score": 20},
+//       {"answer": "milkshake", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kendaraan air",
+//     "answers": [
+//       {"answer": "perahu", "score": 40},
+//       {"answer": "kapal", "score": 35},
+//       {"answer": "perahu karet", "score": 15},
+//       {"answer": "selancar", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan negara yang terkenal dengan pantai",
+//     "answers": [
+//       {"answer": "indonesia", "score": 40},
+//       {"answer": "thailand", "score": 30},
+//       {"answer": "australia", "score": 20},
+//       {"answer": "filipina", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis bunga yang populer",
+//     "answers": [
+//       {"answer": "mawar", "score": 40},
+//       {"answer": "melati", "score": 25},
+//       {"answer": "anggrek", "score": 20},
+//       {"answer": "tulip", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan binatang yang hidup di laut",
+//     "answers": [
+//       {"answer": "hiu", "score": 35},
+//       {"answer": "paus", "score": 25},
+//       {"answer": "lumba-lumba", "score": 20},
+//       {"answer": "udang", "score": 20}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang bisa dibawa bepergian",
+//     "answers": [
+//       {"answer": "tas", "score": 50},
+//       {"answer": "koper", "score": 30},
+//       {"answer": "botol minum", "score": 15},
+//       {"answer": "payung", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan makanan ringan",
+//     "answers": [
+//       {"answer": "keripik", "score": 35},
+//       {"answer": "kacang", "score": 25},
+//       {"answer": "popcorn", "score": 20},
+//       {"answer": "biskuit", "score": 20}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang ada di kamar mandi",
+//     "answers": [
+//       {"answer": "sabun", "score": 35},
+//       {"answer": "sikat gigi", "score": 30},
+//       {"answer": "handuk", "score": 20},
+//       {"answer": "shampoo", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis alat transportasi cepat",
+//     "answers": [
+//       {"answer": "kereta cepat", "score": 40},
+//       {"answer": "pesawat", "score": 35},
+//       {"answer": "mobil sport", "score": 15},
+//       {"answer": "helikopter", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis hewan peliharaan kecil",
+//     "answers": [
+//       {"answer": "hamster", "score": 35},
+//       {"answer": "kelinci", "score": 30},
+//       {"answer": "burung", "score": 20},
+//       {"answer": "tikus", "score": 15}
+//     ]
+//   },
+  
+//   {
+//     "question": "Sebutkan jenis makanan pedas",
+//     "answers": [
+//       {"answer": "sambal", "score": 40},
+//       {"answer": "cabe rawit", "score": 30},
+//       {"answer": "rica-rica", "score": 20},
+//       {"answer": "balado", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang ada di ruang tamu",
+//     "answers": [
+//       {"answer": "sofa", "score": 40},
+//       {"answer": "meja", "score": 30},
+//       {"answer": "televisi", "score": 20},
+//       {"answer": "lampu", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang suka memanjat",
+//     "answers": [
+//       {"answer": "monyet", "score": 50},
+//       {"answer": "kucing", "score": 30},
+//       {"answer": "koala", "score": 15},
+//       {"answer": "tikus", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan alat tulis yang sering dipakai",
+//     "answers": [
+//       {"answer": "pensil", "score": 40},
+//       {"answer": "pulpen", "score": 35},
+//       {"answer": "penghapus", "score": 15},
+//       {"answer": "spidol", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kendaraan darat",
+//     "answers": [
+//       {"answer": "mobil", "score": 50},
+//       {"answer": "motor", "score": 30},
+//       {"answer": "bus", "score": 15},
+//       {"answer": "truk", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang bisa melompat tinggi",
+//     "answers": [
+//       {"answer": "kanguru", "score": 50},
+//       {"answer": "kucing", "score": 25},
+//       {"answer": "kodok", "score": 15},
+//       {"answer": "kelinci", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis minuman hangat",
+//     "answers": [
+//       {"answer": "teh", "score": 40},
+//       {"answer": "kopi", "score": 35},
+//       {"answer": "coklat panas", "score": 15},
+//       {"answer": "jahe", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang hidup di sawah",
+//     "answers": [
+//       {"answer": "ayam", "score": 40},
+//       {"answer": "itik", "score": 30},
+//       {"answer": "kerbau", "score": 20},
+//       {"answer": "ular sawah", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis makanan yang digoreng kriuk",
+//     "answers": [
+//       {"answer": "bakwan", "score": 35},
+//       {"answer": "keripik", "score": 30},
+//       {"answer": "tempe", "score": 20},
+//       {"answer": "tahu", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan alat musik tiup",
+//     "answers": [
+//       {"answer": "seruling", "score": 40},
+//       {"answer": "trumpet", "score": 30},
+//       {"answer": "saxophone", "score": 20},
+//       {"answer": "klarinet", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan olahraga musim dingin",
+//     "answers": [
+//       {"answer": "ski", "score": 40},
+//       {"answer": "ice skating", "score": 30},
+//       {"answer": "hoki es", "score": 20},
+//       {"answer": "snowboarding", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang ada di sekolah",
+//     "answers": [
+//       {"answer": "meja", "score": 40},
+//       {"answer": "kursi", "score": 30},
+//       {"answer": "papan tulis", "score": 20},
+//       {"answer": "spidol", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang sering dipelihara di akuarium",
+//     "answers": [
+//       {"answer": "ikan", "score": 60},
+//       {"answer": "udang", "score": 20},
+//       {"answer": "keong", "score": 15},
+//       {"answer": "katak", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis makanan manis yang sering dijual di pasar",
+//     "answers": [
+//       {"answer": "kue basah", "score": 40},
+//       {"answer": "dodol", "score": 30},
+//       {"answer": "jenang", "score": 20},
+//       {"answer": "klepon", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan benda yang ada di kamar mandi",
+//     "answers": [
+//       {"answer": "shampoo", "score": 40},
+//       {"answer": "sabun", "score": 35},
+//       {"answer": "sikat gigi", "score": 15},
+//       {"answer": "handuk", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis musik yang sering diputar di pesta",
+//     "answers": [
+//       {"answer": "pop", "score": 40},
+//       {"answer": "dance", "score": 30},
+//       {"answer": "rock", "score": 20},
+//       {"answer": "hip-hop", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang bisa hidup di udara dan air",
+//     "answers": [
+//       {"answer": "bebek", "score": 50},
+//       {"answer": "angsa", "score": 30},
+//       {"answer": "platypus", "score": 15},
+//       {"answer": "katak", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kendaraan yang memakai rel",
+//     "answers": [
+//       {"answer": "kereta api", "score": 60},
+//       {"answer": "trem", "score": 25},
+//       {"answer": "monorel", "score": 10},
+//       {"answer": "kereta gantung", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang memiliki cangkang",
+//     "answers": [
+//       {"answer": "kura-kura", "score": 50},
+//       {"answer": "kepiting", "score": 30},
+//       {"answer": "siput", "score": 15},
+//       {"answer": "kerang", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan makanan khas Indonesia",
+//     "answers": [
+//       {"answer": "nasi goreng", "score": 40},
+//       {"answer": "sate", "score": 30},
+//       {"answer": "rendang", "score": 20},
+//       {"answer": "gado-gado", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang terkenal kuat",
+//     "answers": [
+//       {"answer": "gajah", "score": 50},
+//       {"answer": "kerbau", "score": 25},
+//       {"answer": "beruang", "score": 15},
+//       {"answer": "badak", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis baju yang dipakai saat dingin",
+//     "answers": [
+//       {"answer": "jaket", "score": 40},
+//       {"answer": "sweater", "score": 30},
+//       {"answer": "mantel", "score": 20},
+//       {"answer": "scarf", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis makanan yang dibakar",
+//     "answers": [
+//       {"answer": "sate", "score": 50},
+//       {"answer": "ikan bakar", "score": 30},
+//       {"answer": "ayam bakar", "score": 15},
+//       {"answer": "jagung bakar", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan planet di tata surya selain Bumi dan Mars",
+//     "answers": [
+//       {"answer": "Merkurius", "score": 25},
+//       {"answer": "Venus", "score": 25},
+//       {"answer": "Jupiter", "score": 20},
+//       {"answer": "Saturnus", "score": 15},
+//       {"answer": "Uranus", "score": 10},
+//       {"answer": "Neptunus", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis burung pemangsa",
+//     "answers": [
+//       {"answer": "elang", "score": 35},
+//       {"answer": "falcon", "score": 25},
+//       {"answer": "hantu", "score": 20},
+//       {"answer": "elang botak", "score": 10},
+//       {"answer": "kestrel", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan alat musik tradisional dari Indonesia",
+//     "answers": [
+//       {"answer": "gamelan", "score": 35},
+//       {"answer": "angklung", "score": 25},
+//       {"answer": "kendang", "score": 15},
+//       {"answer": "siter", "score": 15},
+//       {"answer": "kolintang", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan bahasa yang digunakan di Afrika Selatan",
+//     "answers": [
+//       {"answer": "Zulu", "score": 30},
+//       {"answer": "Xhosa", "score": 25},
+//       {"answer": "Afrikaans", "score": 20},
+//       {"answer": "Inggris", "score": 15},
+//       {"answer": "Sepedi", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis batu permata",
+//     "answers": [
+//       {"answer": "berlian", "score": 30},
+//       {"answer": "safir", "score": 25},
+//       {"answer": "zamrud", "score": 20},
+//       {"answer": "ruby", "score": 15},
+//       {"answer": "topaz", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan olahraga yang dimainkan di atas es selain hoki",
+//     "answers": [
+//       {"answer": "seluncur cepat", "score": 30},
+//       {"answer": "figure skating", "score": 25},
+//       {"answer": "curling", "score": 25},
+//       {"answer": "bobsled", "score": 10},
+//       {"answer": "luge", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan tokoh penemu terkenal di dunia",
+//     "answers": [
+//       {"answer": "Thomas Edison", "score": 30},
+//       {"answer": "Nikola Tesla", "score": 25},
+//       {"answer": "Alexander Graham Bell", "score": 20},
+//       {"answer": "Galileo Galilei", "score": 15},
+//       {"answer": "Leonardo da Vinci", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan nama gunung tertinggi di dunia selain Everest",
+//     "answers": [
+//       {"answer": "K2", "score": 40},
+//       {"answer": "Kangchenjunga", "score": 25},
+//       {"answer": "Lhotse", "score": 20},
+//       {"answer": "Makalu", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis ikan air tawar yang besar",
+//     "answers": [
+//       {"answer": "lele", "score": 30},
+//       {"answer": "gurame", "score": 25},
+//       {"answer": "patin", "score": 20},
+//       {"answer": "nila", "score": 15},
+//       {"answer": "bandeng", "score": 10}
+//     ]
+//   },
+
+//   {
+//     "question": "Sebutkan makanan khas Jepang selain sushi dan ramen",
+//     "answers": [
+//       {"answer": "tempura", "score": 30},
+//       {"answer": "okonomiyaki", "score": 25},
+//       {"answer": "takoyaki", "score": 20},
+//       {"answer": "sashimi", "score": 15},
+//       {"answer": "udon", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan simbol kimia unsur logam",
+//     "answers": [
+//       {"answer": "Fe", "score": 25},
+//       {"answer": "Cu", "score": 25},
+//       {"answer": "Au", "score": 20},
+//       {"answer": "Ag", "score": 15},
+//       {"answer": "Hg", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kucing ras murni",
+//     "answers": [
+//       {"answer": "Siam", "score": 25},
+//       {"answer": "Persia", "score": 25},
+//       {"answer": "Maine Coon", "score": 20},
+//       {"answer": "Bengal", "score": 15},
+//       {"answer": "Sphynx", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan makanan yang terbuat dari kedelai selain tahu dan tempe",
+//     "answers": [
+//       {"answer": "susu kedelai", "score": 30},
+//       {"answer": "edamame", "score": 25},
+//       {"answer": "miso", "score": 20},
+//       {"answer": "tauco", "score": 15},
+//       {"answer": "natto", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan bentuk geometri selain segitiga, persegi, dan lingkaran",
+//     "answers": [
+//       {"answer": "persegi panjang", "score": 30},
+//       {"answer": "belah ketupat", "score": 25},
+//       {"answer": "trapesium", "score": 20},
+//       {"answer": "jajar genjang", "score": 15},
+//       {"answer": "lingkaran elips", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis kendaraan yang menggunakan tenaga listrik",
+//     "answers": [
+//       {"answer": "mobil listrik", "score": 35},
+//       {"answer": "motor listrik", "score": 25},
+//       {"answer": "sepeda listrik", "score": 20},
+//       {"answer": "skuter listrik", "score": 10},
+//       {"answer": "bus listrik", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan pulau terbesar di dunia selain Greenland",
+//     "answers": [
+//       {"answer": "Nova Guinea", "score": 40},
+//       {"answer": "Borneo", "score": 30},
+//       {"answer": "Madagaskar", "score": 20},
+//       {"answer": "Baffin", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan nama satelit alami selain Bulan",
+//     "answers": [
+//       {"answer": "Io", "score": 25},
+//       {"answer": "Europa", "score": 25},
+//       {"answer": "Titan", "score": 20},
+//       {"answer": "Ganymede", "score": 15},
+//       {"answer": "Callisto", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis tanaman obat tradisional",
+//     "answers": [
+//       {"answer": "jahe", "score": 25},
+//       {"answer": "kunyit", "score": 25},
+//       {"answer": "temulawak", "score": 20},
+//       {"answer": "kencur", "score": 15},
+//       {"answer": "sambiloto", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan penulis buku fantasi terkenal",
+//     "answers": [
+//       {"answer": "J.K. Rowling", "score": 35},
+//       {"answer": "Tolkien", "score": 30},
+//       {"answer": "C.S. Lewis", "score": 20},
+//       {"answer": "Rick Riordan", "score": 10},
+//       {"answer": "George R.R. Martin", "score": 5}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan sungai terpanjang di dunia selain Nil",
+//     "answers": [
+//       {"answer": "Amazon", "score": 40},
+//       {"answer": "Yangtze", "score": 25},
+//       {"answer": "Mississippi", "score": 20},
+//       {"answer": "Yenisei", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan alat transportasi antariksa",
+//     "answers": [
+//       {"answer": "roket", "score": 40},
+//       {"answer": "space shuttle", "score": 30},
+//       {"answer": "satelit", "score": 20},
+//       {"answer": "capsule", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis jamur yang bisa dimakan",
+//     "answers": [
+//       {"answer": "shiitake", "score": 30},
+//       {"answer": "jamur kancing", "score": 25},
+//       {"answer": "jamur tiram", "score": 20},
+//       {"answer": "morel", "score": 15},
+//       {"answer": "enoki", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan kerajaan atau dinasti di sejarah Eropa",
+//     "answers": [
+//       {"answer": "Romanov", "score": 25},
+//       {"answer": "Habsburg", "score": 25},
+//       {"answer": "Windsor", "score": 20},
+//       {"answer": "Bourbon", "score": 15},
+//       {"answer": "Tudor", "score": 15}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan jenis batu bara atau mineral energi",
+//     "answers": [
+//       {"answer": "batu bara", "score": 30},
+//       {"answer": "minyak bumi", "score": 25},
+//       {"answer": "gas alam", "score": 20},
+//       {"answer": "uranium", "score": 15},
+//       {"answer": "lignite", "score": 10}
+//     ]
+//   },
+//   {
+//     "question": "Sebutkan hewan yang bisa hidup di air dan darat (amfibi)",
+//     "answers": [
+//       {"answer": "katak", "score": 35},
+//       {"answer": "salamander", "score": 25},
+//       {"answer": "axolotl", "score": 20},
+//       {"answer": "newt", "score": 10},
+//       {"answer": "caecilian", "score": 10}
+//     ]
+//   }
+
+// ]
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+{
+  "pop_culture": [
+    {"question":"Sebutkan game populer sepanjang masa","answers":[{"answer":"gta","score":30},{"answer":"minecraft","score":25},{"answer":"pubg","score":20},{"answer":"fortnite","score":15},{"answer":"call of duty","score":10}]},
+    {"question":"Sebutkan karakter Mario","answers":[{"answer":"mario","score":30},{"answer":"luigi","score":25},{"answer":"bowser","score":20},{"answer":"peach","score":15},{"answer":"yoshi","score":10}]},
+    {"question":"Sebutkan game battle royale","answers":[{"answer":"pubg","score":30},{"answer":"fortnite","score":25},{"answer":"apex legends","score":20},{"answer":"warzone","score":15},{"answer":"free fire","score":10}]},
+    {"question":"Sebutkan karakter GTA","answers":[{"answer":"cj","score":30},{"answer":"trevor","score":25},{"answer":"michael","score":20},{"answer":"franklin","score":15},{"answer":"tommy vercetti","score":10}]},
+    {"question":"Sebutkan game mobile populer","answers":[{"answer":"mobile legends","score":30},{"answer":"pubg mobile","score":25},{"answer":"free fire","score":20},{"answer":"cod mobile","score":15},{"answer":"genshin impact","score":10}]},
+
+    {"question":"Sebutkan penyanyi pop dunia","answers":[{"answer":"taylor swift","score":30},{"answer":"justin bieber","score":25},{"answer":"ariana grande","score":20},{"answer":"ed sheeran","score":15},{"answer":"billie eilish","score":10}]},
+    {"question":"Sebutkan band terkenal","answers":[{"answer":"coldplay","score":30},{"answer":"maroon 5","score":25},{"answer":"bts","score":20},{"answer":"linkin park","score":15},{"answer":"queen","score":10}]},
+    {"question":"Sebutkan lagu viral","answers":[{"answer":"shape of you","score":30},{"answer":"despacito","score":25},{"answer":"see you again","score":20},{"answer":"blinding lights","score":15},{"answer":"baby","score":10}]},
+    {"question":"Sebutkan penyanyi indonesia terkenal","answers":[{"answer":"noah","score":30},{"answer":"afgan","score":25},{"answer":"tulus","score":20},{"answer":"raisa","score":15},{"answer":"isyana","score":10}]},
+    {"question":"Sebutkan genre musik populer","answers":[{"answer":"pop","score":30},{"answer":"rock","score":25},{"answer":"hip hop","score":20},{"answer":"jazz","score":15},{"answer":"dangdut","score":10}]},
+
+    {"question":"Sebutkan series netflix populer","answers":[{"answer":"stranger things","score":30},{"answer":"money heist","score":25},{"answer":"wednesday","score":20},{"answer":"squid game","score":15},{"answer":"dark","score":10}]},
+    {"question":"Sebutkan karakter stranger things","answers":[{"answer":"eleven","score":30},{"answer":"mike","score":25},{"answer":"dustin","score":20},{"answer":"hopper","score":15},{"answer":"lucas","score":10}]},
+    {"question":"Sebutkan drama korea terkenal","answers":[{"answer":"crash landing on you","score":30},{"answer":"goblin","score":25},{"answer":"descendants of the sun","score":20},{"answer":"itaewon class","score":15},{"answer":"vincenzo","score":10}]},
+    {"question":"Sebutkan karakter squid game","answers":[{"answer":"gi hun","score":30},{"answer":"sang woo","score":25},{"answer":"kang sae byeok","score":20},{"answer":"ali","score":15},{"answer":"front man","score":10}]},
+    {"question":"Sebutkan platform streaming","answers":[{"answer":"netflix","score":30},{"answer":"disney plus","score":25},{"answer":"hbo","score":20},{"answer":"prime video","score":15},{"answer":"viu","score":10}]},
+
+    {"question":"Sebutkan kartun barat terkenal","answers":[{"answer":"spongebob","score":30},{"answer":"tom and jerry","score":25},{"answer":"simpsons","score":20},{"answer":"family guy","score":15},{"answer":"rick and morty","score":10}]},
+    {"question":"Sebutkan karakter spongebob","answers":[{"answer":"spongebob","score":30},{"answer":"patrick","score":25},{"answer":"squidward","score":20},{"answer":"mr krabs","score":15},{"answer":"sandy","score":10}]},
+    {"question":"Sebutkan karakter tom and jerry","answers":[{"answer":"tom","score":30},{"answer":"jerry","score":25},{"answer":"spike","score":20},{"answer":"tyke","score":15},{"answer":"butch","score":10}]},
+    {"question":"Sebutkan kartun disney","answers":[{"answer":"mickey mouse","score":30},{"answer":"donald duck","score":25},{"answer":"goofy","score":20},{"answer":"minnie","score":15},{"answer":"pluto","score":10}]},
+    {"question":"Sebutkan kartun network terkenal","answers":[{"answer":"ben 10","score":30},{"answer":"gumball","score":25},{"answer":"adventure time","score":20},{"answer":"powerpuff girls","score":15},{"answer":"dexter","score":10}]},
+
+    {"question":"Sebutkan karakter game horror","answers":[{"answer":"slenderman","score":30},{"answer":"nemesis","score":25},{"answer":"pyramid head","score":20},{"answer":"freddy","score":15},{"answer":"jason","score":10}]},
+    {"question":"Sebutkan game open world","answers":[{"answer":"gta","score":30},{"answer":"minecraft","score":25},{"answer":"skyrim","score":20},{"answer":"zelda","score":15},{"answer":"red dead","score":10}]},
+    {"question":"Sebutkan karakter genshin impact","answers":[{"answer":"lumine","score":30},{"answer":"aether","score":25},{"answer":"paimon","score":20},{"answer":"diluc","score":15},{"answer":"keqing","score":10}]},
+    {"question":"Sebutkan karakter mobile legends","answers":[{"answer":"alucard","score":30},{"answer":"miya","score":25},{"answer":"layla","score":20},{"answer":"gusion","score":15},{"answer":"chou","score":10}]},
+    {"question":"Sebutkan game fps terkenal","answers":[{"answer":"call of duty","score":30},{"answer":"csgo","score":25},{"answer":"valorant","score":20},{"answer":"battlefield","score":15},{"answer":"overwatch","score":10}]},
+
+    {"question":"Sebutkan idol kpop terkenal","answers":[{"answer":"bts","score":30},{"answer":"blackpink","score":25},{"answer":"exo","score":20},{"answer":"twice","score":15},{"answer":"seventeen","score":10}]},
+    {"question":"Sebutkan member blackpink","answers":[{"answer":"lisa","score":30},{"answer":"jennie","score":25},{"answer":"rose","score":20},{"answer":"jisoo","score":15}]},
+    {"question":"Sebutkan member bts","answers":[{"answer":"jungkook","score":30},{"answer":"v","score":25},{"answer":"jimin","score":20},{"answer":"rm","score":15},{"answer":"suga","score":10}]},
+    {"question":"Sebutkan lagu kpop terkenal","answers":[{"answer":"dynamite","score":30},{"answer":"kill this love","score":25},{"answer":"butter","score":20},{"answer":"how you like that","score":15},{"answer":"love scenario","score":10}]},
+    {"question":"Sebutkan agensi kpop","answers":[{"answer":"yg","score":30},{"answer":"sm","score":25},{"answer":"jyp","score":20},{"answer":"hybe","score":15},{"answer":"cube","score":10}]},
+
+    {"question":"Sebutkan karakter simpsons","answers":[{"answer":"homer","score":30},{"answer":"bart","score":25},{"answer":"lisa","score":20},{"answer":"marge","score":15},{"answer":"maggie","score":10}]},
+    {"question":"Sebutkan karakter rick and morty","answers":[{"answer":"rick","score":30},{"answer":"morty","score":25},{"answer":"summer","score":20},{"answer":"beth","score":15},{"answer":"jerry","score":10}]},
+    {"question":"Sebutkan kartun nickelodeon","answers":[{"answer":"spongebob","score":30},{"answer":"avatar","score":25},{"answer":"fairly oddparents","score":20},{"answer":"dora","score":15},{"answer":"rugrats","score":10}]},
+    {"question":"Sebutkan karakter avatar","answers":[{"answer":"aang","score":30},{"answer":"zuko","score":25},{"answer":"katara","score":20},{"answer":"sokka","score":15},{"answer":"appa","score":10}]},
+    {"question":"Sebutkan karakter ben 10","answers":[{"answer":"ben","score":30},{"answer":"gwen","score":25},{"answer":"kevin","score":20},{"answer":"grandpa max","score":15},{"answer":"heatblast","score":10}]},
+
+    {"question":"Sebutkan game survival terkenal","answers":[{"answer":"minecraft","score":30},{"answer":"ark","score":25},{"answer":"rust","score":20},{"answer":"the forest","score":15},{"answer":"dayz","score":10}]},
+    {"question":"Sebutkan game racing terkenal","answers":[{"answer":"need for speed","score":30},{"answer":"forza","score":25},{"answer":"gran turismo","score":20},{"answer":"mario kart","score":15},{"answer":"asphalt","score":10}]},
+    {"question":"Sebutkan karakter mario kart","answers":[{"answer":"mario","score":30},{"answer":"luigi","score":25},{"answer":"peach","score":20},{"answer":"bowser","score":15},{"answer":"toad","score":10}]},
+    {"question":"Sebutkan game zombie terkenal","answers":[{"answer":"resident evil","score":30},{"answer":"left 4 dead","score":25},{"answer":"the walking dead","score":20},{"answer":"dying light","score":15},{"answer":"dayz","score":10}]},
+    {"question":"Sebutkan karakter resident evil","answers":[{"answer":"leon","score":30},{"answer":"chris","score":25},{"answer":"jill","score":20},{"answer":"claire","score":15},{"answer":"ada wong","score":10}]},
+
+    {"question":"Sebutkan serial barat terkenal","answers":[{"answer":"breaking bad","score":30},{"answer":"game of thrones","score":25},{"answer":"friends","score":20},{"answer":"the office","score":15},{"answer":"sherlock","score":10}]},
+    {"question":"Sebutkan karakter breaking bad","answers":[{"answer":"walter white","score":30},{"answer":"jesse","score":25},{"answer":"saul","score":20},{"answer":"hank","score":15},{"answer":"skyler","score":10}]},
+    {"question":"Sebutkan karakter game of thrones","answers":[{"answer":"jon snow","score":30},{"answer":"daenerys","score":25},{"answer":"tyrion","score":20},{"answer":"arya","score":15},{"answer":"cersei","score":10}]},
+    {"question":"Sebutkan serial komedi","answers":[{"answer":"friends","score":30},{"answer":"himym","score":25},{"answer":"big bang theory","score":20},{"answer":"brooklyn 99","score":15},{"answer":"office","score":10}]},
+    {"question":"Sebutkan karakter friends","answers":[{"answer":"ross","score":30},{"answer":"rachel","score":25},{"answer":"joey","score":20},{"answer":"chandler","score":15},{"answer":"monica","score":10}]}
+  ],
+  "pengetahuan_umum": [
+    {"question":"Sebutkan negara di Asia Tenggara","answers":[{"answer":"indonesia","score":30},{"answer":"malaysia","score":25},{"answer":"thailand","score":20},{"answer":"singapura","score":15},{"answer":"vietnam","score":10}]},
+    {"question":"Sebutkan ibu kota negara di Asia","answers":[{"answer":"jakarta","score":30},{"answer":"bangkok","score":25},{"answer":"tokyo","score":20},{"answer":"seoul","score":15},{"answer":"kuala lumpur","score":10}]},
+    {"question":"Sebutkan negara di Eropa","answers":[{"answer":"inggris","score":30},{"answer":"prancis","score":25},{"answer":"jerman","score":20},{"answer":"italia","score":15},{"answer":"spanyol","score":10}]},
+    {"question":"Sebutkan ibu kota di Eropa","answers":[{"answer":"london","score":30},{"answer":"paris","score":25},{"answer":"berlin","score":20},{"answer":"roma","score":15},{"answer":"madrid","score":10}]},
+    {"question":"Sebutkan negara di Amerika","answers":[{"answer":"amerika serikat","score":30},{"answer":"kanada","score":25},{"answer":"brasil","score":20},{"answer":"argentina","score":15},{"answer":"meksiko","score":10}]},
+
+    {"question":"Sebutkan bahasa dunia yang banyak digunakan","answers":[{"answer":"inggris","score":30},{"answer":"mandarin","score":25},{"answer":"spanyol","score":20},{"answer":"hindi","score":15},{"answer":"arab","score":10}]},
+    {"question":"Sebutkan bahasa resmi di Eropa","answers":[{"answer":"inggris","score":30},{"answer":"prancis","score":25},{"answer":"jerman","score":20},{"answer":"spanyol","score":15},{"answer":"italia","score":10}]},
+    {"question":"Sebutkan bahasa di Asia","answers":[{"answer":"indonesia","score":30},{"answer":"jepang","score":25},{"answer":"korea","score":20},{"answer":"thai","score":15},{"answer":"vietnam","score":10}]},
+    {"question":"Sebutkan bahasa internasional","answers":[{"answer":"inggris","score":40},{"answer":"mandarin","score":25},{"answer":"spanyol","score":15},{"answer":"prancis","score":10},{"answer":"arab","score":10}]},
+    {"question":"Sebutkan bahasa di Afrika","answers":[{"answer":"arab","score":30},{"answer":"zulu","score":25},{"answer":"swahili","score":20},{"answer":"afrikaans","score":15},{"answer":"xhosa","score":10}]},
+
+    {"question":"Sebutkan mata uang negara besar","answers":[{"answer":"dollar","score":30},{"answer":"euro","score":25},{"answer":"yen","score":20},{"answer":"yuan","score":15},{"answer":"pound","score":10}]},
+    {"question":"Sebutkan mata uang Asia","answers":[{"answer":"rupiah","score":30},{"answer":"yen","score":25},{"answer":"won","score":20},{"answer":"ringgit","score":15},{"answer":"baht","score":10}]},
+    {"question":"Sebutkan mata uang Eropa","answers":[{"answer":"euro","score":40},{"answer":"pound","score":25},{"answer":"franc","score":15},{"answer":"krona","score":10},{"answer":"zloty","score":10}]},
+    {"question":"Sebutkan mata uang Amerika","answers":[{"answer":"dollar","score":40},{"answer":"peso","score":25},{"answer":"real","score":15},{"answer":"bolivar","score":10},{"answer":"sol","score":10}]},
+    {"question":"Sebutkan mata uang dunia terkenal","answers":[{"answer":"dollar","score":30},{"answer":"euro","score":25},{"answer":"yen","score":20},{"answer":"pound","score":15},{"answer":"yuan","score":10}]},
+
+    {"question":"Sebutkan kota terkenal di dunia","answers":[{"answer":"new york","score":30},{"answer":"paris","score":25},{"answer":"tokyo","score":20},{"answer":"london","score":15},{"answer":"dubai","score":10}]},
+    {"question":"Sebutkan kota di Indonesia","answers":[{"answer":"jakarta","score":30},{"answer":"bandung","score":25},{"answer":"surabaya","score":20},{"answer":"medan","score":15},{"answer":"yogyakarta","score":10}]},
+    {"question":"Sebutkan kota di Jepang","answers":[{"answer":"tokyo","score":30},{"answer":"osaka","score":25},{"answer":"kyoto","score":20},{"answer":"hiroshima","score":15},{"answer":"nagoya","score":10}]},
+    {"question":"Sebutkan kota di Amerika Serikat","answers":[{"answer":"new york","score":30},{"answer":"los angeles","score":25},{"answer":"chicago","score":20},{"answer":"houston","score":15},{"answer":"miami","score":10}]},
+    {"question":"Sebutkan kota wisata terkenal","answers":[{"answer":"bali","score":30},{"answer":"paris","score":25},{"answer":"tokyo","score":20},{"answer":"rome","score":15},{"answer":"bangkok","score":10}]},
+
+    {"question":"Sebutkan negara di Afrika","answers":[{"answer":"mesir","score":30},{"answer":"afrika selatan","score":25},{"answer":"nigeria","score":20},{"answer":"kenya","score":15},{"answer":"maroko","score":10}]},
+    {"question":"Sebutkan negara di Timur Tengah","answers":[{"answer":"arab saudi","score":30},{"answer":"uae","score":25},{"answer":"qatar","score":20},{"answer":"iran","score":15},{"answer":"irak","score":10}]},
+    {"question":"Sebutkan negara di Oceania","answers":[{"answer":"australia","score":30},{"answer":"selandia baru","score":25},{"answer":"fiji","score":20},{"answer":"samoa","score":15},{"answer":"tonga","score":10}]},
+    {"question":"Sebutkan negara kepulauan","answers":[{"answer":"indonesia","score":30},{"answer":"filipina","score":25},{"answer":"jepang","score":20},{"answer":"maladewa","score":15},{"answer":"bahama","score":10}]},
+    {"question":"Sebutkan negara maju","answers":[{"answer":"amerika serikat","score":30},{"answer":"jepang","score":25},{"answer":"jerman","score":20},{"answer":"inggris","score":15},{"answer":"kanada","score":10}]},
+
+    {"question":"Sebutkan ibu kota di Afrika","answers":[{"answer":"kairo","score":30},{"answer":"pretoria","score":25},{"answer":"nairobi","score":20},{"answer":"rabat","score":15},{"answer":"addis ababa","score":10}]},
+    {"question":"Sebutkan ibu kota di Amerika","answers":[{"answer":"washington dc","score":30},{"answer":"ottawa","score":25},{"answer":"brasilia","score":20},{"answer":"buenos aires","score":15},{"answer":"mexico city","score":10}]},
+    {"question":"Sebutkan ibu kota di Oceania","answers":[{"answer":"canberra","score":30},{"answer":"wellington","score":25},{"answer":"suva","score":20},{"answer":"apia","score":15},{"answer":"nuku alofa","score":10}]},
+    {"question":"Sebutkan ibu kota di Timur Tengah","answers":[{"answer":"riyadh","score":30},{"answer":"abu dhabi","score":25},{"answer":"doha","score":20},{"answer":"teheran","score":15},{"answer":"baghdad","score":10}]},
+    {"question":"Sebutkan ibu kota Asia Tenggara","answers":[{"answer":"jakarta","score":30},{"answer":"bangkok","score":25},{"answer":"hanoi","score":20},{"answer":"manila","score":15},{"answer":"singapura","score":10}]},
+
+    {"question":"Sebutkan negara dengan populasi besar","answers":[{"answer":"china","score":30},{"answer":"india","score":25},{"answer":"amerika serikat","score":20},{"answer":"indonesia","score":15},{"answer":"pakistan","score":10}]},
+    {"question":"Sebutkan negara dengan wilayah luas","answers":[{"answer":"rusia","score":30},{"answer":"kanada","score":25},{"answer":"china","score":20},{"answer":"amerika serikat","score":15},{"answer":"brasil","score":10}]},
+    {"question":"Sebutkan negara di Asia Selatan","answers":[{"answer":"india","score":30},{"answer":"pakistan","score":25},{"answer":"bangladesh","score":20},{"answer":"sri lanka","score":15},{"answer":"nepal","score":10}]},
+    {"question":"Sebutkan negara di Asia Timur","answers":[{"answer":"china","score":30},{"answer":"jepang","score":25},{"answer":"korea selatan","score":20},{"answer":"korea utara","score":15},{"answer":"mongolia","score":10}]},
+    {"question":"Sebutkan negara di Asia Barat","answers":[{"answer":"arab saudi","score":30},{"answer":"iran","score":25},{"answer":"irak","score":20},{"answer":"turki","score":15},{"answer":"israel","score":10}]},
+
+    {"question":"Sebutkan kota di Eropa","answers":[{"answer":"paris","score":30},{"answer":"london","score":25},{"answer":"berlin","score":20},{"answer":"roma","score":15},{"answer":"madrid","score":10}]},
+    {"question":"Sebutkan kota di Asia","answers":[{"answer":"jakarta","score":30},{"answer":"tokyo","score":25},{"answer":"seoul","score":20},{"answer":"bangkok","score":15},{"answer":"beijing","score":10}]},
+    {"question":"Sebutkan kota di Timur Tengah","answers":[{"answer":"dubai","score":30},{"answer":"riyadh","score":25},{"answer":"doha","score":20},{"answer":"teheran","score":15},{"answer":"jerusalem","score":10}]},
+    {"question":"Sebutkan kota di Afrika","answers":[{"answer":"kairo","score":30},{"answer":"nairobi","score":25},{"answer":"lagos","score":20},{"answer":"cape town","score":15},{"answer":"casablanca","score":10}]},
+    {"question":"Sebutkan kota di Oceania","answers":[{"answer":"sydney","score":30},{"answer":"melbourne","score":25},{"answer":"auckland","score":20},{"answer":"wellington","score":15},{"answer":"brisbane","score":10}]},
+
+    {"question":"Sebutkan negara dengan ekonomi besar","answers":[{"answer":"amerika serikat","score":30},{"answer":"china","score":25},{"answer":"jepang","score":20},{"answer":"jerman","score":15},{"answer":"india","score":10}]},
+    {"question":"Sebutkan negara penghasil minyak","answers":[{"answer":"arab saudi","score":30},{"answer":"rusia","score":25},{"answer":"amerika serikat","score":20},{"answer":"iran","score":15},{"answer":"irak","score":10}]},
+    {"question":"Sebutkan negara wisata populer","answers":[{"answer":"indonesia","score":30},{"answer":"prancis","score":25},{"answer":"italia","score":20},{"answer":"jepang","score":15},{"answer":"thailand","score":10}]},
+    {"question":"Sebutkan negara di Amerika Selatan","answers":[{"answer":"brasil","score":30},{"answer":"argentina","score":25},{"answer":"chile","score":20},{"answer":"peru","score":15},{"answer":"kolombia","score":10}]},
+    {"question":"Sebutkan negara di Amerika Utara","answers":[{"answer":"amerika serikat","score":30},{"answer":"kanada","score":25},{"answer":"meksiko","score":20},{"answer":"kuba","score":15},{"answer":"jamaika","score":10}]}
+  ]
+
+}
