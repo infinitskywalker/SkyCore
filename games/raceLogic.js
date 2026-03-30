@@ -11,7 +11,7 @@ const MODE_CONFIG = {
 };
 
 const MODE_INFO = {
-  normal: "Balance antara kecepatan & RNG",
+  normal: "Normal speed & balanced ⚪",
   fast: "Lebih cepat & agresif ⚡",
   chaos: "Banyak event random 🔥",
 };
@@ -39,8 +39,8 @@ function lobbyEmbed(race, host, timeLeft){
   return new EmbedBuilder()
     .setTitle("🏁 Race Lobby")
     .setDescription(
-      `Host: <@${host}> (tidak ikut balapan)\n` +
-      `Mode: **${race.mode.toUpperCase()}**\n(${MODE_INFO[race.mode]})\n\n` +
+      `Host: <@${host}>\n` +
+      `Mode: **${race.mode.toUpperCase()}**\n` +
       `⏳ Waktu join tersisa: **${timeLeft}s**\n\n` +
       `**Racers:**\n${racers}`
     )
@@ -177,7 +177,7 @@ function lobbyHandler(race,msg,hostId){
   col.on("end",(_,r)=>{
     if(r!=="start" && race.racers.length>=2){
       msg.edit({components:disabledRows()});
-      msg.channel.send("🏁 Race dimulai otomatis!");
+      msg.channel.send("🏁 Race dimulai!");
       runRace(race,msg);
     } else if(race.racers.length<2){
       activeRaces.delete(race.channelId);
