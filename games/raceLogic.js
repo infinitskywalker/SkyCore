@@ -28,7 +28,7 @@ const sleep = ms => new Promise(r=>setTimeout(r,ms));
 const shuffle = arr => [...arr].sort(()=>Math.random()-0.5);
 
 function track(r){
-  const pos = Math.min(Math.floor(r.position), TRACK_LENGTH);
+  const pos = Math.min(Math.max(0, Math.floor(r.position)), TRACK_LENGTH);
   return `\`${TRACK_CHAR.repeat(pos)}${r.emoji}${TRACK_CHAR.repeat(TRACK_LENGTH-pos)}\`${FINISH_FLAG}`;
 }
 
@@ -48,12 +48,23 @@ function lobbyEmbed(race, host, timeLeft){
 }
 
 function raceEmbed(race,title,finish=[]){
-  const lines = race.racers.map((r,i)=>{
-    let status = r.finished
-      ? `#${finish.findIndex(f=>f.userId===r.userId)+1}`
-      : `${Math.round((r.position/TRACK_LENGTH)*100)}%`;
+  const medals = ["🥇","🥈","🥉"];
 
-    return `**#${i+1}** ${r.emoji} <@${r.userId}> — ${status}\n${track(r)}`;
+  const lines = race.racers.map((r,i)=>{
+    const finishIndex = finish.findIndex(f=>f.userId===r.userId);
+
+    let status;
+    if(r.finished){
+      status = medals[finishIndex] || `#${finishIndex+1}`;
+    } else {
+      status = `${Math.round((r.position/TRACK_LENGTH)*100)}%`;
+    }
+
+    // const moveText = r.lastMove ? (r.lastMove > 0 ? `(+${r.lastMove})` : `(${r.lastMove})`) : "";
+
+    const eventIcon = r.event ? ` ${r.event}` : "";
+
+    return `**#${i+1}** ${r.emoji} <@${r.userId}> — ${status} ${eventIcon}\n${track(r)}`;
   });
 
   return new EmbedBuilder()
@@ -124,7 +135,7 @@ function lobbyHandler(race,msg,hostId){
 
   const interval = setInterval(()=>{
     timeLeft--;
-    if(timeLeft<=0) return clearInterval(interval);
+    if(timeLeft<=0) return;
 
     msg.edit({
       embeds:[lobbyEmbed(race,hostId,timeLeft)],
@@ -135,13 +146,25 @@ function lobbyHandler(race,msg,hostId){
   const col = msg.createMessageComponentCollector({componentType:ComponentType.Button,time:JOIN_TIMEOUT_MS});
 
   col.on("collect", async i=>{
-    if(race.started){
-      await i.deferUpdate().catch(()=>{});
-      return msg.channel.send("⚠️ Race sudah dimulai!");
+    if(race.started) return i.deferUpdate();
+
+    if(i.customId.startsWith("mode_")){
+      if(i.user.id !== hostId)
+        return i.reply({ content: "Host only!", ephemeral: true });
+
+      if(i.customId === "mode_info"){
+        return i.reply({
+          content:
+            `⚪ ${MODE_INFO.normal}\n⚡ ${MODE_INFO.fast}\n🔥 ${MODE_INFO.chaos}`,
+          ephemeral: true
+        });
+      }
+
+      race.mode = i.customId.split("_")[1];
+      return i.update({embeds:[lobbyEmbed(race,hostId,timeLeft)],components:[modeRow(race.mode), actionRow()]});
     }
 
     if(i.customId==="join"){
-  
       if(race.racers.find(r=>r.userId===i.user.id))
         return i.reply({content:"Sudah join!",ephemeral:true});
 
@@ -149,7 +172,10 @@ function lobbyHandler(race,msg,hostId){
         userId:i.user.id,
         emoji: race.available.shift()||"🐢",
         position:0,
-        finished:false
+        finished:false,
+        lastMove:0,
+        stunned:0,
+        event:null
       });
 
       return i.update({embeds:[lobbyEmbed(race,hostId,timeLeft)],components:[modeRow(race.mode),actionRow()]});
@@ -162,7 +188,10 @@ function lobbyHandler(race,msg,hostId){
 
     if(i.customId==="start"){
       if(i.user.id!==hostId) return i.reply({content:"Host only!",ephemeral:true});
-      if(race.racers.length<2) return i.reply({content:"Minimal 2 pemain!",ephemeral:true});
+      if(race.racers.length<1) return i.reply({content:"Minimal 1 pemain!",ephemeral:true});
+
+      clearInterval(interval);
+      race.started = true;
 
       col.stop("start");
       await i.deferUpdate();
@@ -175,7 +204,12 @@ function lobbyHandler(race,msg,hostId){
   });
 
   col.on("end",(_,r)=>{
+    clearInterval(interval);
+
     if(r!=="start" && race.racers.length>=2){
+      if(race.started) return;
+      race.started = true;
+
       msg.edit({components:disabledRows()});
       msg.channel.send("🏁 Race dimulai!");
       runRace(race,msg);
@@ -189,7 +223,6 @@ function lobbyHandler(race,msg,hostId){
 
 // ===== RACE =====
 async function runRace(race,msg){
-  race.started = true;
   const channel = msg.channel;
   const config = MODE_CONFIG[race.mode];
 
@@ -204,31 +237,53 @@ async function runRace(race,msg){
     for(const r of tickRacers){
       if(r.finished) continue;
 
+      r.event = null;
+
+      if(r.stunned > 0){
+        r.stunned--;
+        r.lastMove = 0;
+        r.event = "⚡";
+        continue;
+      }
+
       const progress = r.position / TRACK_LENGTH;
 
       let move = config.baseMove[0] + Math.random()*(config.baseMove[1]-config.baseMove[0]);
 
-      // lebih fair di akhir
-      if(progress > 0.8){
-        move *= 0.5;
+      // if(progress > 0.8) move *= 0.5;
+
+      const eventChance = race.mode === "chaos" ? 0.40 : 0.08;
+      if(Math.random() < eventChance){
+      // if(Math.random() < 0.08){
+        const rand = Math.random();
+        if(rand < 0.33){
+          move += 3;
+          r.event = "💨";
+        } else if(rand < 0.66){
+          move -= 2;
+          r.event = "🍌";
+        } else {
+          r.stunned = 1;
+          // r.stunned = race.mode === "chaos" ? 2 : 1; 
+          r.event = "⚡";
+        }
       }
 
-      // boost makin kecil kalau udah depan
       if(Math.random()<config.boostChance*(1-progress)) move+=2;
-
-      // lag kecil aja biar ga brutal
       if(Math.random()<config.lagChance*(1-progress/2)) move-=1;
 
       if(race.mode==="chaos" && Math.random()<0.1){
-        r.position += (Math.random()<0.5 ? -2 : 3);
+        move += (Math.random()<0.5 ? -2 : 3);
       }
 
-      // hard cap biar ga teleport finish
-      if(r.position + move > TRACK_LENGTH){
-        move = TRACK_LENGTH - r.position;
+      let finalMove = Math.max(1, Math.round(move));
+
+      if(r.position + finalMove > TRACK_LENGTH){
+        finalMove = TRACK_LENGTH - r.position;
       }
 
-      r.position += Math.max(0,move);
+      r.position += finalMove;
+      r.lastMove = finalMove;
 
       if(r.position>=TRACK_LENGTH){
         r.position=TRACK_LENGTH;
@@ -237,8 +292,17 @@ async function runRace(race,msg){
       }
     }
 
+    // // 🔥 leader
+    // const leader = [...race.racers].sort((a,b)=>b.position-a.position)[0];
+    // if(leader && !leader.finished){
+    //   leader.event = "👑";
+    // }
+
     const title = finish.length===race.racers.length ? "🏆 Finished!" : "🏎️ Racing...";
-    await raceMsg.edit({embeds:[raceEmbed(race,title,finish)]});
+
+    await raceMsg.edit({
+      embeds:[raceEmbed(race,title,finish)]
+    });
   }
 
   const medals=["🥇","🥈","🥉"];
@@ -251,10 +315,7 @@ async function runRace(race,msg){
     embeds:[
       new EmbedBuilder()
         .setTitle("🏆 Race Results")
-        .setDescription(
-          `Mode: **${race.mode.toUpperCase()}**\n\n` +
-          `🔥 Hasil akhir balapan:\n\n${resultText}`
-        )
+        .setDescription(`Mode: **${race.mode.toUpperCase()}**\n\n${resultText}`)
         .setColor(0xffd700)
     ]
   });

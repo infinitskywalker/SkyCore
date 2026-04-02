@@ -37,7 +37,7 @@ module.exports = {
           name: "💰 Race Betting (Auto)",
           value:
             "`!raceauto <jumlah racer> <mode>` → Race dengan betting\n" +
-            "**Contoh:**`!raceauto 5 fast`\n\n" +
+            "**Contoh:**`!raceauto 5 fast`\n" +
             "`!bet <racer>` → Pilih racer untuk betting",
         },
         // ===== MODES =====
@@ -46,7 +46,7 @@ module.exports = {
           value:
             "⚪ Normal → Balance\n" +
             "⚡ Fast → Satset gaspol\n" +
-            "🔥 Chaos → Banyak hal-hal random, ngeboost, ngesiput, dkk",
+            "🔥 Chaos → Banyak hal-hal random, ngeboost, ngesiput, dkk\n",
         },
       )
 
