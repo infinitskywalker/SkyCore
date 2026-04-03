@@ -188,7 +188,7 @@ function lobbyHandler(race,msg,hostId){
 
     if(i.customId==="start"){
       if(i.user.id!==hostId) return i.reply({content:"Host only!",ephemeral:true});
-      if(race.racers.length<1) return i.reply({content:"Minimal 1 pemain!",ephemeral:true});
+      if(race.racers.length<2) return i.reply({content:"Minimal 2 pemain!",ephemeral:true});
 
       clearInterval(interval);
       race.started = true;

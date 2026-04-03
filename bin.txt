@@ -1,3 +1,103 @@
+`# 💣 BOMB ARENA — CARA MAIN
+
+## 🎯 TUJUAN
+Jangan jadi orang yang megang bomb saat waktu habis.
+Yang terakhir hidup = 🏆 WINNER
+
+---
+
+## 🔥 ALUR GAME
+- 1 player akan pegang 💣 bomb
+- Timer berjalan diam-diam ⏳
+- Holder harus cepat ambil aksi
+- Kalau waktu habis → 💥 MELEDAK & mati
+
+---
+
+## ⚡ COMMAND (SAAT PEGANG BOMB)
+
+### 📤 PASS
+\`p @user\` → lempar bomb ke target  
+\`p r\` → lempar ke random player  
+
+⚠️ Limit:
+- Max 2x chain pass
+- Bisa kena event: No Pass / Target Lock
+
+---
+
+### 🧠 DISARM
+\`d\`
+
+- 35% SUCCESS → bomb pindah ke orang lain
+- 65% FAIL → 💀 mati langsung
+
+🔥 High risk, high reward!
+
+---
+
+### ⚔️ DUEL
+\`c @user\`
+
+- Roll angka 1–100
+- Yang kalah:
+  - Kalau holder kalah → mati
+  - Kalau target kalah → jadi holder
+
+🔥 Cocok buat clutch / balas dendam
+
+---
+
+## 👻 SAAT SUDAH MATI (GHOST MODE)
+
+Masih bisa ganggu game 😈
+
+### 🔥 curse
+Tambah waktu (bikin holder panik)
+
+### ⚡ panic
+Percepat timer (semua panik)
+
+### 🔄 swap
+Tukar holder secara random
+
+⏳ Cooldown: 5 detik
+
+---
+
+## 🎲 CHAOS EVENT (OTOMATIS)
+
+Kadang bakal muncul event random:
+
+🚫 NO PASS  
+→ gak bisa pass sementara  
+
+🎯 TARGET LOCK  
+→ hanya boleh pass ke target tertentu  
+
+⚡ PANIC MODE  
+→ timer jadi super cepat  
+
+---
+
+## 🧠 TIPS BIAR MENANG
+
+- Jangan terlalu lama mikir 😏
+- Spam pass bisa bikin orang panik
+- Duel di timing yang tepat 🔥
+- Disarm kalau kepepet
+- Ghost = kesempatan balas dendam 😈
+
+---
+
+## 💡 CATATAN
+- Game ini cepat & chaotic
+- Semakin sedikit player → makin brutal
+
+---
+
+💬 Siap? Tekan JOIN dan mulai kekacauan!`,
+
 
       // // Reveal Jawaban
       // const reveal = new EmbedBuilder().setTitle("📊 Jawaban");

@@ -3,55 +3,50 @@ const { EmbedBuilder } = require("discord.js");
 module.exports = {
   name: 'help',
   execute(message) {
+const embed = new EmbedBuilder()
+  .setTitle("🎮 86Core — Command List")
+  .setColor(0x00AE86)
 
-    const embed = new EmbedBuilder()
-      .setTitle("86Core Command List")
-      .setDescription("Daftar fitur dan command yang tersedia di bot ini")
-      .setColor(0x00AE86)
+  .addFields(
 
-      // ===== GENERAL =====
-      .addFields(
-        {
-          name: "⚙️ General",
-          value:
-            "`!help` → Menampilkan daftar command\n" +
-            "`!ping` → Cek respon bot\n",
-        },
+    // ===== GENERAL =====
+    {
+      name: "⚙️ General",
+      value:
+        "• `!help` — lihat semua command\n" +
+        "• `!ping` — cek bot aktif",
+    },
 
-        // ===== FAMILY 100 =====
-        {
-          name: "🧠 Family 100",
-          value:
-            "`!f100` → Memulai game Family 100\n",
-        },
+    // ===== FAMILY 100 =====
+    {
+      name: "🧠 Family 100",
+      value:
+        "• `!f100` — mulai game tebak jawaban",
+    },
 
-        // ===== RACE MANUAL =====
-        {
-          name: "🏁 Race",
-          value:
-            "`!race` → Memulai race \n",
-        },
+    // ===== RACE =====
+    {
+      name: "🏁 Race",
+      value:
+        "• `!race` — mulai race biasa\n" +
+        "• `!raceauto <jumlah> <mode>` — race + betting\n" +
+        "• `!bet <racer>` — pilih jagoan\n" +
+        "Mode:⚪ normal | ⚡ fast | 🔥 chaos\n"
+    },
 
-        // ===== RACE AUTO (BET) =====
-        {
-          name: "💰 Race Betting (Auto)",
-          value:
-            "`!raceauto <jumlah racer> <mode>` → Race dengan betting\n" +
-            "**Contoh:**`!raceauto 5 fast`\n" +
-            "`!bet <racer>` → Pilih racer untuk betting",
-        },
-        // ===== MODES =====
-        {
-          name: "🎮 Race Modes",
-          value:
-            "⚪ Normal → Balance\n" +
-            "⚡ Fast → Satset gaspol\n" +
-            "🔥 Chaos → Banyak hal-hal random, ngeboost, ngesiput, dkk\n",
-        },
-      )
+    // ===== BOMB =====
+    {
+      name: "💣 Bomb Arena",
+      value:
+        "• `!bomb` — mulai game bomb\n"
+        // "• `pass @user` — oper bomb\n\n"+
+        // "• `disarm` — oper bomb\n\n"+
+        // "• `duel` — oper bomb\n\n"
+    }
 
-      .setFooter({ text: "Enjoy with 86Core! 🏎️💨" });
+  )
 
+  .setFooter({ text: "Have fun & don't panic 🚀" });
     message.reply({ embeds: [embed] });
   }
 };
