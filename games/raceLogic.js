@@ -3,17 +3,12 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentTyp
 // ===== CONFIG =====
 const TRACK_LENGTH = 48;
 const JOIN_TIMEOUT_MS = 25000;
+const MAX_PLAYERS = 25;
 
 const MODE_CONFIG = {
   normal: { tick: 1500, baseMove: [3,5], boostChance: 0.1, lagChance: 0.05 },
   fast:   { tick: 900,  baseMove: [4,7], boostChance: 0.15, lagChance: 0.03 },
   chaos:  { tick: 1200, baseMove: [2,6], boostChance: 0.2, lagChance: 0.1 },
-};
-
-const MODE_INFO = {
-  normal: "Normal speed & balanced ⚪",
-  fast: "Lebih cepat & agresif ⚡",
-  chaos: "Banyak event random 🔥",
 };
 
 const RACERS_EMOJIS = ["🐸","🦆","🐧","🦀","🐙","🦑","🐡","🦞","🐹","🦔","🦦","🦥","🐼","🦘","🦙","🐨","🦁","🐯","🐻","🐷","🐵","🐔","🦉","🦇","🐴","🦄","🐝","🦋","🐌","🐍","🦎","🦂","🦟","🦗","🐞","🦠","🐲","👾","🤖","🚗","🏎️","🚀","🛸","🚁","🛶","⛵","🛴"];
@@ -42,7 +37,7 @@ function lobbyEmbed(race, host, timeLeft){
       `Host: <@${host}>\n` +
       `Mode: **${race.mode.toUpperCase()}**\n` +
       `⏳ Waktu join tersisa: **${timeLeft}s**\n\n` +
-      `**Racers:**\n${racers}`
+      `**Racers (${race.racers.length}/${MAX_PLAYERS}):**\n${racers}`
     )
     .setColor(0x5865f2);
 }
@@ -60,8 +55,6 @@ function raceEmbed(race,title,finish=[]){
       status = `${Math.round((r.position/TRACK_LENGTH)*100)}%`;
     }
 
-    // const moveText = r.lastMove ? (r.lastMove > 0 ? `(+${r.lastMove})` : `(${r.lastMove})`) : "";
-
     const eventIcon = r.event ? ` ${r.event}` : "";
 
     return `**#${i+1}** ${r.emoji} <@${r.userId}> — ${status} ${eventIcon}\n${track(r)}`;
@@ -73,35 +66,33 @@ function raceEmbed(race,title,finish=[]){
     .setColor(0xf5a623);
 }
 
-// ===== BUTTONS =====
-function modeRow(mode){
-  return new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId("mode_normal").setLabel(mode==="normal"?"⚪ Normal ✅":"⚪ Normal").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("mode_fast").setLabel(mode==="fast"?"⚡ Fast ✅":"⚡ Fast").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("mode_chaos").setLabel(mode==="chaos"?"🔥 Chaos ✅":"🔥 Chaos").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("mode_info").setLabel("ℹ️ Mode Info").setStyle(ButtonStyle.Secondary)
-  );
-}
+// ===== BUTTON =====
+function mainRow(race){
+  const icons = { normal:"⚪", fast:"⚡", chaos:"🔥" };
 
-function actionRow(){
   return new ActionRowBuilder().addComponents(
-    new ButtonBuilder().setCustomId("join").setLabel("Join 🏎️").setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId("leave").setLabel("Leave 🚫").setStyle(ButtonStyle.Danger),
-    new ButtonBuilder().setCustomId("start").setLabel("Start 🏁").setStyle(ButtonStyle.Success)
+    new ButtonBuilder()
+      .setCustomId("mode_cycle")
+      .setLabel(`${icons[race.mode]} ${race.mode.toUpperCase()}`)
+      .setStyle(ButtonStyle.Primary),
+
+    new ButtonBuilder()
+      .setCustomId("toggle_join")
+      .setLabel("🎯 Join / Leave")
+      .setStyle(ButtonStyle.Success),
+
+    new ButtonBuilder()
+      .setCustomId("start")
+      .setLabel("🏁 Start")
+      .setStyle(ButtonStyle.Danger)
   );
 }
 
 function disabledRows(){
   return [
     new ActionRowBuilder().addComponents(
-      new ButtonBuilder().setCustomId("mode_normal").setLabel("⚪ Normal").setStyle(ButtonStyle.Secondary).setDisabled(true),
-      new ButtonBuilder().setCustomId("mode_fast").setLabel("⚡ Fast").setStyle(ButtonStyle.Secondary).setDisabled(true),
-      new ButtonBuilder().setCustomId("mode_chaos").setLabel("🔥 Chaos").setStyle(ButtonStyle.Secondary).setDisabled(true),
-      new ButtonBuilder().setCustomId("mode_info").setLabel("ℹ️ Mode Info").setStyle(ButtonStyle.Secondary).setDisabled(true)
-    ),
-    new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId("mode").setLabel("Mode").setStyle(ButtonStyle.Secondary).setDisabled(true),
       new ButtonBuilder().setCustomId("join").setLabel("Join").setStyle(ButtonStyle.Secondary).setDisabled(true),
-      new ButtonBuilder().setCustomId("leave").setLabel("Leave").setStyle(ButtonStyle.Secondary).setDisabled(true),
       new ButtonBuilder().setCustomId("start").setLabel("Start").setStyle(ButtonStyle.Secondary).setDisabled(true)
     )
   ];
@@ -123,7 +114,7 @@ async function startRace(channel, hostUser){
 
   const msg = await channel.send({
     embeds:[lobbyEmbed(race,hostUser.id, Math.floor(JOIN_TIMEOUT_MS/1000))],
-    components:[modeRow(race.mode), actionRow()]
+    components:[mainRow(race)]
   });
 
   lobbyHandler(race,msg,hostUser.id);
@@ -139,7 +130,7 @@ function lobbyHandler(race,msg,hostId){
 
     msg.edit({
       embeds:[lobbyEmbed(race,hostId,timeLeft)],
-      components:[modeRow(race.mode),actionRow()]
+      components:[mainRow(race)]
     }).catch(()=>{});
   },1000);
 
@@ -148,44 +139,60 @@ function lobbyHandler(race,msg,hostId){
   col.on("collect", async i=>{
     if(race.started) return i.deferUpdate();
 
-    if(i.customId.startsWith("mode_")){
-      if(i.user.id !== hostId)
-        return i.reply({ content: "Host only!", ephemeral: true });
+    // MODE
+    if(i.customId==="mode_cycle"){
+      if(i.user.id!==hostId)
+        return i.reply({content:"Host only!",ephemeral:true});
 
-      if(i.customId === "mode_info"){
-        return i.reply({
-          content:
-            `⚪ ${MODE_INFO.normal}\n⚡ ${MODE_INFO.fast}\n🔥 ${MODE_INFO.chaos}`,
-          ephemeral: true
+      const modes = ["normal","fast","chaos"];
+      const index = modes.indexOf(race.mode);
+      race.mode = modes[(index+1)%modes.length];
+
+      return i.update({embeds:[lobbyEmbed(race,hostId,timeLeft)],components:[mainRow(race)]});
+    }
+
+    // JOIN / LEAVE
+    if(i.customId==="toggle_join"){
+      const existing = race.racers.find(r=>r.userId===i.user.id);
+
+      if(!existing && race.racers.length >= MAX_PLAYERS){
+        return i.reply({content:"Slot penuh!",ephemeral:true});
+      }
+
+      if(existing){
+        race.racers = race.racers.filter(r=>r.userId!==i.user.id);
+      } else {
+        race.racers.push({
+          userId:i.user.id,
+          emoji: race.available.shift()||"🐢",
+          position:0,
+          finished:false,
+          lastMove:0,
+          stunned:0,
+          event:null
         });
       }
 
-      race.mode = i.customId.split("_")[1];
-      return i.update({embeds:[lobbyEmbed(race,hostId,timeLeft)],components:[modeRow(race.mode), actionRow()]});
+      // AUTO START
+      if(race.racers.length >= MAX_PLAYERS){
+        race.started = true;
+
+        clearInterval(interval);
+        col.stop("full");
+
+        await i.update({
+          embeds:[lobbyEmbed(race,hostId,0)],
+          components:disabledRows()
+        });
+
+        msg.channel.send("🔥 Slot penuh! Race otomatis dimulai!");
+        return runRace(race,msg);
+      }
+
+      return i.update({embeds:[lobbyEmbed(race,hostId,timeLeft)],components:[mainRow(race)]});
     }
 
-    if(i.customId==="join"){
-      if(race.racers.find(r=>r.userId===i.user.id))
-        return i.reply({content:"Sudah join!",ephemeral:true});
-
-      race.racers.push({
-        userId:i.user.id,
-        emoji: race.available.shift()||"🐢",
-        position:0,
-        finished:false,
-        lastMove:0,
-        stunned:0,
-        event:null
-      });
-
-      return i.update({embeds:[lobbyEmbed(race,hostId,timeLeft)],components:[modeRow(race.mode),actionRow()]});
-    }
-
-    if(i.customId==="leave"){
-      race.racers = race.racers.filter(r=>r.userId!==i.user.id);
-      return i.update({embeds:[lobbyEmbed(race,hostId,timeLeft)],components:[modeRow(race.mode),actionRow()]});
-    }
-
+    // START
     if(i.customId==="start"){
       if(i.user.id!==hostId) return i.reply({content:"Host only!",ephemeral:true});
       if(race.racers.length<2) return i.reply({content:"Minimal 2 pemain!",ephemeral:true});
@@ -206,13 +213,17 @@ function lobbyHandler(race,msg,hostId){
   col.on("end",(_,r)=>{
     clearInterval(interval);
 
+    if(r==="full") return;
+
     if(r!=="start" && race.racers.length>=2){
       if(race.started) return;
+
       race.started = true;
 
       msg.edit({components:disabledRows()});
       msg.channel.send("🏁 Race dimulai!");
       runRace(race,msg);
+
     } else if(race.racers.length<2){
       activeRaces.delete(race.channelId);
       msg.edit({components:disabledRows()});
@@ -232,49 +243,54 @@ async function runRace(race,msg){
   while(finish.length<race.racers.length){
     await sleep(config.tick);
 
-    const tickRacers = shuffle(race.racers);
+    // GLOBAL CHAOS
+    if(race.mode==="chaos" && Math.random()<0.08){
+      race.racers.forEach(r=>{
+        if(r.finished) return;
+        if(Math.random()<0.5){
+          r.position = Math.max(0, r.position-1);
+          r.event="🌪️";
+        } else {
+          r.position+=1;
+          r.event="✨";
+        }
+      });
+    }
 
-    for(const r of tickRacers){
+    for(const r of shuffle(race.racers)){
       if(r.finished) continue;
 
-      r.event = null;
+      r.event=null;
 
-      if(r.stunned > 0){
+      if(r.stunned>0){
         r.stunned--;
-        r.lastMove = 0;
-        r.event = "⚡";
+        r.event="⚡";
         continue;
       }
 
-      const progress = r.position / TRACK_LENGTH;
+      const progress = r.position/TRACK_LENGTH;
 
       let move = config.baseMove[0] + Math.random()*(config.baseMove[1]-config.baseMove[0]);
 
-      // if(progress > 0.8) move *= 0.5;
+      const eventChance = race.mode==="chaos"?0.55:0.08;
 
-      const eventChance = race.mode === "chaos" ? 0.40 : 0.08;
-      if(Math.random() < eventChance){
-      // if(Math.random() < 0.08){
+      if(Math.random()<eventChance){
         const rand = Math.random();
-        if(rand < 0.33){
-          move += 3;
-          r.event = "💨";
-        } else if(rand < 0.66){
-          move -= 2;
-          r.event = "🍌";
-        } else {
-          r.stunned = 1;
-          // r.stunned = race.mode === "chaos" ? 2 : 1; 
-          r.event = "⚡";
-        }
+
+        if(rand<0.25){ move+=4; r.event="🚀"; }
+        else if(rand<0.45){ move-=3; r.event="🍌"; }
+        else if(rand<0.65){ r.stunned = race.mode==="chaos"?2:1; r.event="⚡"; move=0; }
+        else if(rand<0.8){ r.position=Math.max(0,r.position-3); r.event="💥"; move=0; }
+        else if(progress<0.5){ move+=5; r.event="🔥"; }
+      }
+
+      if(race.mode==="chaos"){
+        if(progress>0.7 && Math.random()<0.25){ move-=2; r.event="😵"; }
+        if(progress<0.4 && Math.random()<0.3){ move+=2; r.event="🔥"; }
       }
 
       if(Math.random()<config.boostChance*(1-progress)) move+=2;
       if(Math.random()<config.lagChance*(1-progress/2)) move-=1;
-
-      if(race.mode==="chaos" && Math.random()<0.1){
-        move += (Math.random()<0.5 ? -2 : 3);
-      }
 
       let finalMove = Math.max(1, Math.round(move));
 
@@ -283,7 +299,6 @@ async function runRace(race,msg){
       }
 
       r.position += finalMove;
-      r.lastMove = finalMove;
 
       if(r.position>=TRACK_LENGTH){
         r.position=TRACK_LENGTH;
@@ -292,17 +307,9 @@ async function runRace(race,msg){
       }
     }
 
-    // // 🔥 leader
-    // const leader = [...race.racers].sort((a,b)=>b.position-a.position)[0];
-    // if(leader && !leader.finished){
-    //   leader.event = "👑";
-    // }
-
     const title = finish.length===race.racers.length ? "🏆 Finished!" : "🏎️ Racing...";
 
-    await raceMsg.edit({
-      embeds:[raceEmbed(race,title,finish)]
-    });
+    await raceMsg.edit({embeds:[raceEmbed(race,title,finish)]});
   }
 
   const medals=["🥇","🥈","🥉"];
