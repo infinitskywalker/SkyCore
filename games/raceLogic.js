@@ -55,7 +55,7 @@ function raceEmbed(race,title,finish=[]){
       status = `${Math.round((r.position/TRACK_LENGTH)*100)}%`;
     }
 
-    const eventIcon = r.event ? ` ${r.event}` : "";
+    const eventIcon = (!r.finished && r.event) ? ` ${r.event}` : "";
 
     return `**#${i+1}** ${r.emoji} <@${r.userId}> — ${status} ${eventIcon}\n${track(r)}`;
   });
@@ -84,7 +84,12 @@ function mainRow(race){
     new ButtonBuilder()
       .setCustomId("start")
       .setLabel("🏁 Start")
-      .setStyle(ButtonStyle.Danger)
+      .setStyle(ButtonStyle.Danger),
+      
+    new ButtonBuilder()
+      .setCustomId("mode_info")
+      .setLabel("ℹ️ Info")
+      .setStyle(ButtonStyle.Secondary)
   );
 }
 
@@ -208,6 +213,28 @@ function lobbyHandler(race,msg,hostId){
 
       runRace(race,msg);
     }
+
+    // INFO
+    if(i.customId === "mode_info"){
+  return i.reply({
+    ephemeral: true,
+    content:
+    `**RACE GAME INFO**
+🎮 Mode:
+    ⚪ Normal → stabil & seimbang  
+    ⚡ Fast → lebih cepat & agresif  
+    🔥 Chaos → penuh event random & chaos
+⚡ Event:
+    🚀 Turbo → maju cepat  
+    🍌 Slip → melambat  
+    ⚡ Stun → tidak bergerak  
+    💥 Mundur → posisi turun  
+    🧲 Magnet → tarik ke depan  
+    💣 Bomb → stun sekitar  
+    🔥 Boost → comeback  
+    👑 Leader → target utama`
+          });
+        }
   });
 
   col.on("end",(_,r)=>{
@@ -277,11 +304,21 @@ async function runRace(race,msg){
       if(Math.random()<eventChance){
         const rand = Math.random();
 
-        if(rand<0.25){ move+=4; r.event="🚀"; }
-        else if(rand<0.45){ move-=3; r.event="🍌"; }
-        else if(rand<0.65){ r.stunned = race.mode==="chaos"?2:1; r.event="⚡"; move=0; }
-        else if(rand<0.8){ r.position=Math.max(0,r.position-3); r.event="💥"; move=0; }
-        else if(progress<0.5){ move+=5; r.event="🔥"; }
+        if(rand < 0.2){move += 4;r.event = "🚀";} 
+        else if(rand < 0.35){move -= 3;r.event = "🍌";} 
+        else if(rand < 0.5){r.stunned = 2;r.event = "⚡";move = 0;} 
+        else if(rand < 0.65){r.position = Math.max(0, r.position - 3);r.event = "💥";move = 0;        } 
+        else if(rand < 0.78){const leader = [...race.racers].sort((a,b)=>b.position-a.position)[0];
+          if(leader && leader.userId !== r.userId){
+            r.position = Math.min(r.position + 2, leader.position);r.event = "🧲";}
+        }
+        else if(rand < 0.9){race.racers.forEach(target=>{
+            if(target.userId !== r.userId && Math.abs(target.position - r.position) <= 3){
+              target.stunned = 1;target.event = "💣";}
+          });
+          r.event = "💣";move = 0;
+        }
+        else {if(progress < 0.5){move += 5;r.event = "🔥";}}
       }
 
       if(race.mode==="chaos"){
@@ -306,7 +343,17 @@ async function runRace(race,msg){
         finish.push(r);
       }
     }
+// 👑 leader mark
+const leader = [...race.racers].sort((a,b)=>b.position-a.position)[0];
 
+if(leader && !leader.finished){
+  leader.event = "👑";
+
+  // chaos = leader jadi target
+  if(race.mode === "chaos" && Math.random() < 0.3){
+    leader.stunned = Math.max(leader.stunned,1);
+  }
+}
     const title = finish.length===race.racers.length ? "🏆 Finished!" : "🏎️ Racing...";
 
     await raceMsg.edit({embeds:[raceEmbed(race,title,finish)]});
