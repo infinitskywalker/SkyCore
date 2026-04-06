@@ -26,11 +26,14 @@ const embed = new EmbedBuilder()
 
     // ===== RACE =====
     {
-      name: "🏁 Race",
+      name: "🏁 Race 🏁",
       value:
+        "##🏎️Race\n" +
         "• `!race` — mulai race biasa\n" +
-        "• `!raceauto <jumlah> <mode>` — race + betting\n" +
-        "• `!bet <racer>` — pilih jagoan\n" +
+        "##🏇Race Betting\n" +
+        "• `!racebet` — mulai race + betting\n" +
+        "• `!jb @user` — bandar approve player\n" +
+        "• `!bet <racer>` — approved player pilih jagoan\n" +
         "Mode:⚪ normal | ⚡ fast | 🔥 chaos\n"
     },
 

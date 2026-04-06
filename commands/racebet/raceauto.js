@@ -1,9 +1,9 @@
-const raceAuto = require('../games/raceAutoLogic');
+const raceAuto = require('../../games/raceAutoLogic');
 
 const ALLOWED_ROLE_IDS = ["1394327915210215434", "1476816118210498642", "1486314222009712660"];
 
 module.exports = {
-  name: 'raceauto',
+  name: 'racebet',
   execute: async (message, args) => {
 
     const hasPermission = message.member.roles.cache.some(role =>
@@ -18,9 +18,11 @@ module.exports = {
 
     message.delete().catch(()=>{});
 
-    const count = parseInt(args[0]) || 2;
-    const mode = args[1] || "normal";
+    // const count = parseInt(args[0]) || 2;
+    // const mode = args[1] || "normal";
 
-    raceAuto.startAutoRace(message.channel, count, mode);
+    const hostId = message.author.id;
+    // const hostName = message.author.username;
+    raceAuto.startAutoRace(message.channel, hostId);
   },
 };

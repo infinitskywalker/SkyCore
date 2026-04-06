@@ -1,3 +1,240 @@
+const { EmbedBuilder } = require("discord.js");
+const BET_DURATION = 15000;
+
+// ===== GLOBAL BET STORAGE =====
+const activeBets = new Map(); // raceId -> { bets, open, totalRacers }
+
+const { TRACK_LENGTH, MODE_CONFIG, RACERS_EMOJIS, FINISH_FLAG, TRACK_CHAR } = require("../utils/race/raceConfig");
+const { sleep, shuffle } = require("../utils/race/raceHelpers");
+const { calculateMove } = require("../utils/race/raceEngine");
+const { buildTrack } = require("../utils/race/raceHelpers");
+
+function track(r){
+  const emoji = r.effect ? `${r.effect}${r.baseEmoji}` : r.baseEmoji;
+  return buildTrack(r.position, emoji);
+}
+
+// ===== EMBED =====
+function raceEmbed(race, title, finish=[]){
+  const maxPos = Math.max(...race.racers.map(r => r.position));
+
+  const lines = race.racers.map((r,i)=>{
+    let status = r.finished
+      ? `#${finish.findIndex(f=>f.id===r.id)+1}`
+      : `${Math.round((r.position/TRACK_LENGTH)*100)}%`;
+
+    let emojiDisplay = 
+    // r.effect ? `${r.effect}${r.baseEmoji}` : 
+    r.baseEmoji;
+
+    // if(r.position === maxPos && !r.finished){
+    //   emojiDisplay = `🏎️ ${emojiDisplay}`;
+    // }
+
+    return `**#${i+1}** ${emojiDisplay} — ${status}\n${track(r)}`;
+  });
+
+  return new EmbedBuilder()
+    .setTitle(title)
+    .setDescription(lines.join("\n\n"))
+    .setColor(0xf5a623);
+}
+
+// ===== MAIN =====
+async function startAutoRace(channel, count=2, mode="normal"){
+  if(count < 2 || count > 10){
+    return channel.send("Jumlah racer 2 - 10");
+  }
+
+  if(!MODE_CONFIG[mode]) mode = "normal";
+
+  const raceId = Date.now();
+  const emojis = shuffle(RACERS_EMOJIS).slice(0, count);
+
+  const race = {
+    id: raceId,
+    mode,
+    racers: emojis.map((e,i)=>({
+      id: i,
+      baseEmoji: e,
+      effect: null,
+      position: 0,
+      finished: false
+    }))
+  };
+
+  const config = MODE_CONFIG[mode];
+
+  // ===== INIT BET =====
+  activeBets.set(raceId, {
+    bets: new Map(),
+    open: true,
+    totalRacers: count,  
+  racerMap: Object.fromEntries(
+    race.racers.map((r,i)=>[i+1, r.baseEmoji])
+  )
+    // racers: race.racers 
+  });
+
+  // ===== START EMBED =====
+  const startEmbed = new EmbedBuilder()
+    .setTitle("🎲 RACE BETTING START")
+    .setDescription(
+      `Mode: **${mode.toUpperCase()}**\n` +
+      `Total Racer: **${count}**\n\n` +
+      // race.racers.map((r,i)=>`**${i+1}.** ${r.baseEmoji}`).join("\n") +
+      race.racers.map((r,i)=>`🏁 **Racer #${i+1}** → ${r.baseEmoji}`).join("\n") +
+      `\n\n💰 Tebak: \`!bet <nomor>\``
+    )
+    .setColor(0x5865f2);
+
+  await channel.send({ embeds: [startEmbed] });
+
+  // ===== COUNTDOWN =====
+  let countdown = BET_DURATION / 1000;
+
+  const countdownMsg = await channel.send({
+    embeds: [new EmbedBuilder()
+      .setTitle("⏳ Waktu Tebak")
+      .setDescription(`Waktu tersisa: **${countdown}s**\nBelum ada yang menebak!`)
+      .setColor(0xf5a623)
+    ]
+  });
+
+  const countdownInterval = setInterval(async () => {
+    countdown--;
+
+    const betData = activeBets.get(raceId);
+    let bettorsList = "";
+
+    if(betData && betData.bets.size > 0){
+      bettorsList = [...betData.bets.entries()]
+        // .map(([userId, choice]) => `<@${userId}> → #${choice}`)
+                .map(([userId, choice]) => {
+          const racerEmoji = race.racers[choice - 1]?.baseEmoji || "❓";
+          return `<@${userId}> → ${racerEmoji} (#${choice})`;
+        })
+        .join("\n");
+    }
+
+    if(countdown % 2 === 0){ // reduce spam edit
+      await countdownMsg.edit({
+        embeds: [new EmbedBuilder()
+          .setTitle("⏳ Waktu Tebak")
+          .setDescription(
+            `Waktu tersisa: **${countdown}s**\n` +
+            (bettorsList || "Belum ada yang menebak!")
+          )
+          .setColor(0xf5a623)
+        ]
+      });
+    }
+
+  }, 1000);
+
+  // ===== CLOSE BET =====
+  await sleep(BET_DURATION);
+  clearInterval(countdownInterval);
+
+  const betDataFinal = activeBets.get(raceId);
+
+  if(!betDataFinal || betDataFinal.bets.size === 0){
+    activeBets.delete(raceId);
+    return channel.send("❌ Race dibatalkan karena tidak ada yang menebak!");
+  }
+
+  betDataFinal.open = false;
+  await channel.send("⛔ Waktu tebak habis!");
+
+  // ===== START RACE =====
+  const raceMsg = await channel.send({
+    embeds: [raceEmbed(race, "🏎️ Racing...")]
+  });
+
+  const finish = [];
+
+  while(finish.length < race.racers.length){
+    await sleep(config.tick);
+
+    for(const r of race.racers){
+      if(r.finished) continue;
+
+      r.effect = null;
+
+      const result = calculateMove(r, config, mode);
+
+      r.effect = result.event;
+      r.position += result.move;
+
+      r.position = Math.max(0, r.position);
+
+      if(r.position >= TRACK_LENGTH){
+        r.position = TRACK_LENGTH;
+        r.finished = true;
+        finish.push(r);
+      }
+    }
+
+    const title = finish.length === race.racers.length ? "🏆 Finished!" : "🏎️ Racing...";
+    await raceMsg.edit({ embeds: [raceEmbed(race, title, finish)] });
+  }
+
+  // ===== RESULT =====
+  const medals = ["🥇","🥈","🥉"];
+
+  const resultText = finish.map((r,i)=>
+    `${medals[i] || `${i+1}.`} ${r.baseEmoji}`
+  ).join("\n");
+
+  const winnerIndex = finish[0].id + 1;
+
+  let winners = [];
+
+  for(const [userId, choice] of betDataFinal.bets){
+    if(choice === winnerIndex){
+      winners.push(`<@${userId}>`);
+    }
+  }
+
+  await channel.send({
+    embeds: [
+      new EmbedBuilder()
+        .setTitle("🏆 RACE BETTING RESULT")
+        .setDescription(
+          `Mode: **${mode.toUpperCase()}**\n\n` +
+          `${resultText}\n\n` +
+          `🎉 Pemenang: ${finish[0].baseEmoji} (Racer #${winnerIndex})\n\n` +
+          (winners.length
+            ? `🎁 Pemenang Tebakan:\n${winners.join("\n")}`
+            : "😢 Tak ada yang benar!, bapuk lu semua")
+        )
+        .setColor(0xffd700)
+    ]
+  });
+
+  activeBets.delete(raceId);
+}
+
+// ===== EXPORT =====
+module.exports = { startAutoRace, activeBets };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 `# 💣 BOMB ARENA — CARA MAIN
 
 ## 🎯 TUJUAN

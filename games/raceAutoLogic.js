@@ -1,49 +1,26 @@
-const { EmbedBuilder } = require("discord.js");
+const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
+const { sleep, shuffle, buildTrack } = require("../utils/race/raceHelpers");
+const { calculateMove } = require("../utils/race/raceEngine");
+const { TRACK_LENGTH, MODE_CONFIG, RACERS_EMOJIS } = require("../utils/race/raceConfig");
 
-// ===== CONFIG =====
-const TRACK_LENGTH = 48;
+const MODE_ICONS = { normal:"⚪", fast:"⚡", chaos:"🔥" };
+const RACER_OPTIONS = [2,5,10];
 const BET_DURATION = 15000;
 
-const MODE_CONFIG = {
-  normal: { tick: 1200, baseMove: [3,5], boostChance: 0.1, lagChance: 0.05 },
-  fast:   { tick: 800,  baseMove: [4,7], boostChance: 0.15, lagChance: 0.03 },
-  chaos:  { tick: 1000, baseMove: [2,6], boostChance: 0.2, lagChance: 0.1 },
-};
-
-const RACERS_EMOJIS = [
-  "🐸","🦆","🐧","🦀","🐙","🐡","🐹","🦔","🦦","🦥",
-  "🐼","🦘","🦙","🐨","🦁","🐯","🐻","🐷","🐵","🐔",
-  "🐴","🦄","🐝","🐌","🐍","🦎","🐲","👾","🤖","🚗","🏎️","🚀"
-];
-
-const FINISH_FLAG = "🏁";
-const TRACK_CHAR = "─";
-
-// ===== GLOBAL BET STORAGE =====
-const activeBets = new Map(); // raceId -> { bets, open, totalRacers }
-
-// ===== HELPER =====
-const sleep = ms => new Promise(r => setTimeout(r, ms));
-const shuffle = arr => [...arr].sort(() => Math.random() - 0.5);
+const activeBets = new Map(); // raceId -> state
 
 function track(r){
-  const pos = Math.min(Math.floor(r.position), TRACK_LENGTH);
-  return `\`${TRACK_CHAR.repeat(pos)}${r.emoji}${TRACK_CHAR.repeat(TRACK_LENGTH-pos)}\`${FINISH_FLAG}`;
+  const emoji = r.effect ? `${r.effect}${r.baseEmoji}` : r.baseEmoji;
+  return buildTrack(r.position, emoji);
 }
 
-// ===== EMBED =====
 function raceEmbed(race, title, finish=[]){
-    const maxPos = Math.max(...race.racers.map(r => r.position));
   const lines = race.racers.map((r,i)=>{
-    let status = r.finished
-      ? `#${finish.findIndex(f=>f.id===r.id)+1}`
+    let status = r.finished 
+      ? `#${finish.findIndex(f=>f.id===r.id)+1}` 
       : `${Math.round((r.position/TRACK_LENGTH)*100)}%`;
-     
-    let emojiDisplay = r.emoji;
-    if(r.position === maxPos && !r.finished) emojiDisplay = `🏎️ ${r.emoji}`; // highlight leader
-    return `**#${i+1}** ${emojiDisplay} — ${status}\n${track(r)}`;
 
-    // return `**#${i+1}** ${r.emoji} — ${status}\n${track(r)}`;
+    return `**#${i+1}** ${r.baseEmoji} — ${status}\n${track(r)}`;
   });
 
   return new EmbedBuilder()
@@ -52,101 +29,242 @@ function raceEmbed(race, title, finish=[]){
     .setColor(0xf5a623);
 }
 
-// ===== MAIN =====
-async function startAutoRace(channel, count=2, mode="normal"){
-  if(count < 2 || count > 10){
-    return channel.send("Jumlah racer 2 - 10");
-  }
+// ✅ BET BUTTON (dynamic)
+function getBetRow(selectedAmount){
+  const amounts = [5000, 10000, 50000, 100000];
 
-  if(!MODE_CONFIG[mode]) mode = "normal";
+  return new ActionRowBuilder().addComponents(
+    amounts.map(a => 
+      new ButtonBuilder()
+        .setCustomId(`bet_${a}`)
+        .setLabel(`${a/1000}K ${selectedAmount === a ? "✅" : ""}`)
+        .setStyle(selectedAmount === a ? ButtonStyle.Success : ButtonStyle.Secondary)
+    )
+  );
+}
 
+// ===== START AUTO RACE =====
+async function startAutoRace(channel, hostId) {
   const raceId = Date.now();
-  const emojis = shuffle(RACERS_EMOJIS).slice(0, count);
 
+  const state = {
+    bets: new Map(),
+    open: true,
+    totalRacers: 2,
+    mode: "normal",
+    // players: [],
+  approvedPlayers: [], // ✅ NEW
+    hostId,
+    raceId,
+    channelId: channel.id,
+    betAmount: 5000, // ✅ penting
+    lobbyMessage: null,
+  };
+state.lobbyMessage = null;
+  activeBets.set(raceId, state);
+const embed = buildLobbyEmbed(state);
+
+  // ===== BUTTONS =====
+  const row1 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder().setCustomId('cycle_mode').setLabel(`${MODE_ICONS[state.mode]} ${state.mode.toUpperCase()}`).setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('cycle_racers').setLabel(`${state.totalRacers} Racers`).setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('start_race').setLabel('🏁 Start').setStyle(ButtonStyle.Danger)
+  );
+
+  const msg = await channel.send({
+    embeds:[embed],
+    components:[getBetRow(state.betAmount),row1]
+  });
+state.lobbyMessage = msg; // ✅ TAMBAHIN INI
+
+  // ===== COLLECTOR =====
+  let closed_lobby_time = 300000; // 5 menit 
+  const collector = msg.createMessageComponentCollector({ time:closed_lobby_time });
+
+  collector.on('collect', async i => {
+    if(!activeBets.has(raceId)) return;
+    const s = activeBets.get(raceId);
+
+    await i.deferUpdate();
+
+    switch(i.customId){
+
+      case 'cycle_mode':
+        if(i.user.id !== s.hostId) 
+          return i.followUp({ content:"❌ Hanya host bisa ubah mode", ephemeral:true });
+
+        const modes = Object.keys(MODE_ICONS);
+        let idx = modes.indexOf(s.mode);
+        s.mode = modes[(idx+1)%modes.length];
+      break;
+
+      case 'cycle_racers':
+        if(i.user.id !== s.hostId) 
+          return i.followUp({ content:"❌ Hanya host bisa ubah total racer", ephemeral:true });
+
+        let idxR = RACER_OPTIONS.indexOf(s.totalRacers);
+        s.totalRacers = RACER_OPTIONS[(idxR+1)%RACER_OPTIONS.length];
+      break;
+
+      case 'start_race':
+        if(i.user.id !== s.hostId) 
+          return i.followUp({ content:"❌ Hanya host bisa start race", ephemeral:true });
+
+        if(!s.betAmount)
+          return i.followUp({ content:"❌ Pilih bet dulu!", ephemeral:true });
+
+        if(s.approvedPlayers.length < 1)
+          return i.followUp({ content:"❌ Minimal ada 1 player!", ephemeral:true });
+
+        collector.stop();
+        startRaceCore(i.channel, s);
+        return;
+
+      default:
+        // ✅ HANDLE BET
+        if(i.customId.startsWith("bet_")){
+          if(i.user.id !== s.hostId){
+            return i.followUp({
+              content:"❌ Hanya host yang bisa menentukan bet!",
+              ephemeral:true
+            });
+          }
+
+          const amount = parseInt(i.customId.split("_")[1]);
+          s.betAmount = amount;
+
+          await i.followUp({
+            content:`💰 Bet diset ke **${amount/1000}K**`,
+            ephemeral:true
+          });
+        }
+      break;
+    }
+
+    // ===== UPDATE UI =====
+    const updatedEmbed = new EmbedBuilder()
+      .setTitle("🎲 RACE SETUP")
+      .setDescription(
+        `👤 Host: <@${s.hostId}>\n` +
+        `🕹️ Mode: ${MODE_ICONS[s.mode]} **${s.mode.toUpperCase()}**\n` +
+        `🏎️ Total Racers: **${s.totalRacers}**\n` +
+        `💰 Bet: ${s.betAmount ? `**${s.betAmount/1000}K** 💸` : "Belum dipilih"}\n\n` +
+        `🟢 Approved Players:\n${s.approvedPlayers.map(id=>`<@${id}>`).join("\n") || "Belum ada pemain"}`
+      )
+      .setColor(0x5865f2);
+
+    row1.components[0].setLabel(`${MODE_ICONS[s.mode]} ${s.mode.toUpperCase()}`);
+    row1.components[1].setLabel(`${s.totalRacers} Racers`);
+
+    await i.editReply({
+      embeds:[updatedEmbed],
+      components:[getBetRow(s.betAmount),row1]
+    });
+  });
+
+  collector.on('end', () => {
+    if(!msg.deleted) msg.edit({ components:[] }).catch(()=>{});
+  });
+}
+
+function buildLobbyEmbed(state){
+  return new EmbedBuilder()
+    .setTitle("🎲 RACE SETUP")
+    .setDescription(
+      `👤 Host: <@${state.hostId}>\n` +
+      `🕹️ Mode: ${MODE_ICONS[state.mode]} **${state.mode.toUpperCase()}**\n` +
+      `🏎️ Total Racers: **${state.totalRacers}**\n` +
+      `💰 Bet: ${state.betAmount ? `**${state.betAmount/1000}K** 💸` : "Belum dipilih"}\n\n` +
+      `🟢 Approved Players:\n${
+        state.approvedPlayers.map(id=>`<@${id}>`).join("\n") || "Belum ada pemain"
+      }`
+    )
+    .setColor(0x5865f2);
+}
+// ===== CORE RACE =====
+async function startRaceCore(channel, state){
+  const { totalRacers: count, mode, hostId, betAmount } = state;
+
+  const emojis = shuffle(RACERS_EMOJIS).slice(0, count);
   const race = {
-    id: raceId,
+    id: Date.now(),
     mode,
+    betAmount, // ✅ dari state
     racers: emojis.map((e,i)=>({
-      id: i,
-      emoji: e,
-      position: 0,
-      finished: false
+      id:i,
+      baseEmoji:e,
+      effect:null,
+      position:0,
+      finished:false
     }))
   };
 
-  const config = MODE_CONFIG[mode];
+state.racerMap = Object.fromEntries(
+  race.racers.map((r,i)=>[i+1, r.baseEmoji])
+);
+  // state.bets = new Map();
+  state.open = true;
 
-  // ===== INIT BET =====
-  activeBets.set(raceId, {
-    bets: new Map(),
-    open: true,
-    totalRacers: count
-  });
-
-  // ===== START EMBED =====
   const startEmbed = new EmbedBuilder()
-    .setTitle("🎲 AUTO RACE START")
+    .setTitle("🎲 RACE BETTING START")
     .setDescription(
+      `👤 Host: <@${hostId}>\n` +
       `Mode: **${mode.toUpperCase()}**\n` +
-      `Total Racer: **${count}**\n\n` +
-      race.racers.map((r,i)=>`**${i+1}.** ${r.emoji}`).join("\n") +
+      `💰 Bet: **${betAmount/1000}K**\n\n` +
+      race.racers.map((r,i)=>`🏁 **Racer #${i+1}** → ${r.baseEmoji}`).join("\n") +
       `\n\n💰 Tebak: \`!bet <nomor>\``
     )
     .setColor(0x5865f2);
 
-  await channel.send({ embeds: [startEmbed] });
-  
-  // ===== COUNTDOWN + LIST BETTERS =====
-  let countdown = BET_DURATION / 1000; // detik
-  const countdownMsg = await channel.send({ embeds: [new EmbedBuilder()
-    .setTitle("⏳ Waktu Tebak")
-    .setDescription(`Waktu tersisa: **${countdown}s**\nBelum ada yang menebak!`)
-    .setColor(0xf5a623)
-  ]});
+  await channel.send({ embeds:[startEmbed] });
 
-  const countdownInterval = setInterval(async () => {
-    countdown--;
+  // ===== COUNTDOWN =====
+  let countdown = BET_DURATION/1000;
 
-    const betData = activeBets.get(raceId);
+  const countdownMsg = await channel.send({
+    embeds:[new EmbedBuilder()
+      .setTitle("⏳ Waktu Tebak")
+      .setDescription(`Waktu tersisa: **${countdown}s**\nBelum ada yang menebak!`)
+      .setColor(0xf5a623)
+    ]
+  });
+
+  const interval = setInterval(async ()=>{
+    // countdown--;
+
     let bettorsList = "";
-    if(betData && betData.bets.size > 0){
-      bettorsList = [...betData.bets.entries()]
-        .map(([userId, choice]) => `<@${userId}> → #${choice}`)
+    if(state.bets.size>0){
+      bettorsList = [...state.bets.entries()]
+        .map(([uid,c])=>`<@${uid}> → ${race.racers[c-1]?.baseEmoji} (#${c})`)
         .join("\n");
     }
-
-    // update embed
-    await countdownMsg.edit({ embeds: [new EmbedBuilder()
+  await countdownMsg.edit({
+    embeds:[new EmbedBuilder()
       .setTitle("⏳ Waktu Tebak")
       .setDescription(
-        `Waktu tersisa: **${countdown}s**\n` +
-        (bettorsList || "Belum ada yang menebak!")
+        `Waktu tersisa: **${countdown}s**\n${bettorsList || "Belum ada yang menebak!"}`
       )
       .setColor(0xf5a623)
-    ]});
-
-  }, 1000);
-
-  // ===== CLOSE BET =====
-  await sleep(BET_DURATION);
-  clearInterval(countdownInterval);
-
-  const betDataFinal = activeBets.get(raceId);
-
-  if(!betDataFinal || betDataFinal.bets.size === 0){
-    activeBets.delete(raceId);
-    return channel.send("❌ Race dibatalkan karena tidak ada yang menebak!");
+    ]
+  });
+  countdown--;
+  if(countdown < 0){
+    clearInterval(interval);
   }
+}, 1000);
 
-  if(betDataFinal) betDataFinal.open = false;
-  await channel.send("⛔ Waktu tebak habis!");
+  await sleep(BET_DURATION);
+  clearInterval(interval);
 
-  // ===== START RACE =====
+  state.open = false;
+  await channel.send("⛔ Race betting telah dimulai!");
+
   const raceMsg = await channel.send({
-    embeds: [raceEmbed(race, "🏎️ Racing...")]
+    embeds:[raceEmbed(race, "🏎️ Racing...")]
   });
 
   const finish = [];
+  const config = MODE_CONFIG[mode];
 
   while(finish.length < race.racers.length){
     await sleep(config.tick);
@@ -154,33 +272,12 @@ async function startAutoRace(channel, count=2, mode="normal"){
     for(const r of race.racers){
       if(r.finished) continue;
 
-      let move = config.baseMove[0] + Math.random() * (config.baseMove[1] - config.baseMove[0]);
+      r.effect = null;
+      const res = calculateMove(r, config, mode);
 
-      //  if(Math.random() < config.boostChance) {
-      //   move += 2;
-      //   r.emoji = `⚡${r.emoji}`;
-      //   }
-      //   if(Math.random() < config.lagChance) {
-      //       move -= 2;
-      //       r.emoji = `🐌${r.emoji}`;
-      //   }
-      if(Math.random() < config.boostChance) move += 2;
-      if(Math.random() < config.lagChance) move -= 2;
-
-      if(mode === "chaos" && Math.random() < 0.15){
-        r.position += (Math.random() < 0.5 ? -4 : 6);
-      }
-if(mode.startsWith("chaos")){
-  const eventRoll = Math.random();
-  if(eventRoll < 0.05){ // 5% chance
-    r.position += 3; // lucky boost
-    r.emoji = `🍀${r.emoji}`;
-  } else if(eventRoll < 0.10){ // next 5%
-    r.position -= 2; // obstacle
-    r.emoji = `🪨${r.emoji}`;
-  }
-}
-      r.position += Math.max(0, move);
+      r.effect = res.event;
+      r.position += res.move;
+      r.position = Math.max(0, r.position);
 
       if(r.position >= TRACK_LENGTH){
         r.position = TRACK_LENGTH;
@@ -189,45 +286,67 @@ if(mode.startsWith("chaos")){
       }
     }
 
-    const title = finish.length === race.racers.length ? "🏆 Finished!" : "🏎️ Racing...";
-    await raceMsg.edit({ embeds: [raceEmbed(race, title, finish)] });
+    await raceMsg.edit({
+      embeds:[raceEmbed(
+        race,
+        finish.length===race.racers.length ? "🏆 Finished!" : "🏎️ Racing...",
+        finish
+      )]
+    });
   }
 
-  // ===== RESULT =====
   const medals = ["🥇","🥈","🥉"];
-  const resultText = finish.map((r,i)=>
-    `${medals[i] || `${i+1}.`} ${r.emoji}`
+  const resultText = finish.map((r,i)=>`${medals[i]||`${i+1}.`} ${r.baseEmoji}`).join("\n");
+
+  const winnerIndex = finish[0].id+1;
+  // let winners = [];
+  const totalBettors = state.bets.size;
+const totalPool = totalBettors * betAmount;
+
+let winners = [];
+for(const [uid, choice] of state.bets){
+  if(choice === winnerIndex){
+    winners.push(uid);
+  }
+}
+
+let rewardText = "";
+const houseCut = 0.1; // 10%
+const poolAfterCut = Math.floor(totalPool * (1 - houseCut));
+
+if(winners.length > 0){
+  const rewardPerUser = Math.floor(totalPool / winners.length);
+  // const rewardPerUser = Math.floor(poolAfterCut / winners.length);
+
+  rewardText = winners.map(uid => 
+    `💰 <@${uid}> +${rewardPerUser}`
   ).join("\n");
 
-  const winnerIndex = finish[0].id + 1;
-  let winners = [];
+} else {
+  rewardText = "🏦 Bandar cair nih 😈";
+}
 
-  if(betDataFinal){
-    for(const [userId, choice] of betDataFinal.bets){
-      if(choice === winnerIndex){
-        winners.push(`<@${userId}>`);
-      }
-    }
+  for(const [uid, choice] of state.bets){
+    if(choice===winnerIndex) winners.push(`<@${uid}>`);
   }
 
   await channel.send({
-    embeds: [
-      new EmbedBuilder()
-        .setTitle("🏆 AUTO RACE RESULT")
-        .setDescription(
-          `Mode: **${mode.toUpperCase()}**\n\n` +
-          `${resultText}\n\n` +
-          `🎉 Pemenang: ${finish[0].emoji} (Racer #${winnerIndex})\n\n` +
-          (winners.length
-            ? `🎁 Pemenang Tebakan:\n${winners.join("\n")}`
-            : "😢 Tidak ada yang benar!")
-        )
-        .setColor(0xffd700)
+    embeds:[new EmbedBuilder()
+      .setTitle("🏆 RACE BETTING RESULT")
+      .setDescription(
+        `Mode: **${mode.toUpperCase()}**\n\n` +
+        `${resultText}\n\n` +
+        `🎉 Pemenang: ${finish[0].baseEmoji} (Racer #${winnerIndex})\n\n` +
+        `🎯 Total Pool: **${totalPool}**
+          ${winners.length
+          ? `🎁 Pemenang:\n${rewardText}`
+          : rewardText}`
+      )
+      .setColor(0xffd700)
     ]
   });
-
-  activeBets.delete(raceId);
+activeBets.delete(state.raceId);
+  // activeBets.delete(race.id);
 }
 
-// ===== EXPORT =====
-module.exports = { startAutoRace, activeBets };
+module.exports = { startAutoRace, activeBets, buildLobbyEmbed  };

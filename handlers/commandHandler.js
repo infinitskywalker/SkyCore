@@ -1,10 +1,22 @@
 const fs = require('fs');
+const path = require('path');
 
 module.exports = (client) => {
-  const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
 
-  for (const file of commandFiles) {
-    const command = require(`../commands/${file}`);
-    client.commands.set(command.name, command);
+  function readCommands(dir){
+    const files = fs.readdirSync(dir);
+
+    for(const file of files){
+      const fullPath = path.join(dir, file);
+
+      if(fs.lstatSync(fullPath).isDirectory()){
+        readCommands(fullPath); // 🔁 recursive
+      } else if(file.endsWith('.js')){
+        const command = require(fullPath);
+        client.commands.set(command.name, command);
+      }
+    }
   }
+
+  readCommands(path.join(__dirname, '../commands'));
 };
