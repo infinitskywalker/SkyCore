@@ -23,7 +23,6 @@ const embed = new EmbedBuilder()
       value:
         "• `!f100` — mulai game tebak jawaban",
     },
-
     // ===== RACE =====
     {
       name: "🏁 Race 🏁",

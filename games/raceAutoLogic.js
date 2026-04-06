@@ -31,7 +31,7 @@ function raceEmbed(race, title, finish=[]){
 
 // ✅ BET BUTTON (dynamic)
 function getBetRow(selectedAmount){
-  const amounts = [5000, 10000, 50000, 100000];
+  const amounts = [10000, 25000, 50000, 100000];
 
   return new ActionRowBuilder().addComponents(
     amounts.map(a => 
@@ -57,7 +57,7 @@ async function startAutoRace(channel, hostId) {
     hostId,
     raceId,
     channelId: channel.id,
-    betAmount: 5000, // ✅ penting
+    betAmount: 10000, // ✅ penting
     lobbyMessage: null,
   };
 state.lobbyMessage = null;
@@ -67,8 +67,8 @@ const embed = buildLobbyEmbed(state);
   // ===== BUTTONS =====
   const row1 = new ActionRowBuilder().addComponents(
     new ButtonBuilder().setCustomId('cycle_mode').setLabel(`${MODE_ICONS[state.mode]} ${state.mode.toUpperCase()}`).setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId('cycle_racers').setLabel(`${state.totalRacers} Racers`).setStyle(ButtonStyle.Primary),
-    new ButtonBuilder().setCustomId('start_race').setLabel('🏁 Start').setStyle(ButtonStyle.Danger)
+    new ButtonBuilder().setCustomId('cycle_racers').setLabel(`${state.totalRacers} RACERS`).setStyle(ButtonStyle.Primary),
+    new ButtonBuilder().setCustomId('start_race').setLabel('🏁 START').setStyle(ButtonStyle.Danger)
   );
 
   const msg = await channel.send({
@@ -135,7 +135,7 @@ state.lobbyMessage = msg; // ✅ TAMBAHIN INI
 
           await i.followUp({
             content:`💰 Bet diset ke **${amount/1000}K**`,
-            ephemeral:true
+            ephemeral:false
           });
         }
       break;
@@ -154,7 +154,7 @@ state.lobbyMessage = msg; // ✅ TAMBAHIN INI
       .setColor(0x5865f2);
 
     row1.components[0].setLabel(`${MODE_ICONS[s.mode]} ${s.mode.toUpperCase()}`);
-    row1.components[1].setLabel(`${s.totalRacers} Racers`);
+    row1.components[1].setLabel(`${s.totalRacers} RACERS`);
 
     await i.editReply({
       embeds:[updatedEmbed],
