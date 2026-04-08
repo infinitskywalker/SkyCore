@@ -1,3 +1,41 @@
+
+    // function subcategoryMenu() {
+    //   let options = [{ label: "—", value: "none" }];
+    //   if (selectedCategory !== "Random") {
+    //     const subs = Object.keys(questions[selectedCategory]||{});
+    //     if (subs.length) options = subs.map(s=>({ label: s, value: s, default: selectedSubcategory===s }));
+    //   }
+    //   return new ActionRowBuilder().addComponents(
+    //     new StringSelectMenuBuilder()
+    //       .setCustomId("select_subcategory")
+    //       .setPlaceholder("SubKategori")
+    //       .setOptions(options)
+    //       .setDisabled(selectedCategory==="Random")
+    //   );
+    // }
+  // for (const cat of categories) {
+  //   const catPath = path.join(basePath, cat);
+  //   if (!fs.statSync(catPath).isDirectory()) continue;
+  //   allQuestions[cat] = {};
+  //   const subcats = fs.readdirSync(catPath);
+  //   for (const sub of subcats) {
+  //     if (!sub.endsWith(".json")) continue;
+  //     const subPath = path.join(catPath, sub);
+  //     const data = JSON.parse(fs.readFileSync(subPath));
+  //     allQuestions[cat][sub.replace(".json","")] = data;
+  //   }
+  // }
+  
+
+      // // ===== Subcategory =====
+      // if (i.customId==="select_subcategory" && i.user.id===host.id) {
+      //   selectedSubcategory = i.values[0];
+      //   await renderLobby();
+      //   await i.deferUpdate();
+      //   return;
+      // }
+
+
 const { EmbedBuilder } = require("discord.js");
 const BET_DURATION = 15000;
 

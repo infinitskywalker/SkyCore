@@ -27,13 +27,14 @@ const embed = new EmbedBuilder()
     {
       name: "🏁 Race 🏁",
       value:
-        "##🏎️Race\n" +
+        "**🏎️Race Classic\n**" +
         "• `!race` — mulai race biasa\n" +
-        "##🏇Race Betting\n" +
+        "**🏇Race Betting\n**" +
         "• `!racebet` — mulai race + betting\n" +
         "• `!jb @user` — bandar approve player\n" +
         "• `!bet <racer>` — approved player pilih jagoan\n" +
-        "Mode:⚪ normal | ⚡ fast | 🔥 chaos\n"
+        "**🎪Mode**\n" +
+        "⚪ normal | ⚡ fast | 🔥 chaos\n\n"
     },
 
     // ===== BOMB =====
